@@ -1,5 +1,5 @@
 # ESP32 con sensores ambientales
-![Montaje del proyecto](montaje.jpg)
+![Montaje del proyecto](montaje.jpg.png)
 Estación de monitoreo con ESP32-S3 en Arduino IDE. Mide luz, sonido, temperatura y humedad, y envía los datos a ThingSpeak y a Firebase Realtime Database.
 
 ## Qué mide
