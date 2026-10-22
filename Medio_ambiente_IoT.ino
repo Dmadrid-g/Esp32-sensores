@@ -17,7 +17,7 @@
 #define ENABLE_DATABASE   // debe ir ANTES de incluir FirebaseClient.h
 
 #include <Wire.h>
-#include <WiFi.h>d
+#include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <FirebaseClient.h>
 #include <ThingSpeak.h>
