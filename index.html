@@ -2,247 +2,2914 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Medio Ambiente</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F2F7F9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#050E15" media="(prefers-color-scheme: dark)">
+<title>Monitor Ambiental · I.U. Pascual Bravo</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
+:root {
+  /* Sistema de diseño institucional I.U. Pascual Bravo */
+  --bg: #F2F7F9;
+  --card: #FFFFFF;
+  --card-alt: #F6FAFC;
+  --ink: #072138;
+  --muted: #4A6478;
+  --line: rgba(7, 33, 56, 0.1);
+  --fill: rgba(0, 59, 92, 0.07);
+  --glass: rgba(242, 247, 249, 0.86);
+
+  --pb-navy: #002B49;
+  --pb-blue: #005B8F;
+  --pb-cyan: #009FE3;
+  --pb-aqua: #00A896;
+  --acc: #007A8C;
+
+  /* Estados semánticos unificados */
+  --ok: #0A8754;
+  --ok-bg: rgba(10, 135, 84, 0.12);
+  --warn: #B46500;
+  --warn-bg: rgba(180, 101, 0, 0.13);
+  --bad: #C93128;
+  --bad-bg: rgba(201, 49, 40, 0.13);
+  --info: #006BB3;
+  --info-bg: rgba(0, 107, 179, 0.12);
+
+  /* Colores de segmentos de la escala térmica */
+  --seg-info: #38BDF8;
+  --seg-ok: #2CE6C5;
+  --seg-warn: #FBBF24;
+  --seg-bad: #F87171;
+  --tone: #2CE6C5;
+
+  /* Dimensiones configurables del contenedor del logo institucional */
+  --logo-size: 108px;
+  --logo-radius: 24px;
+  --logo-pad: 2px;
+
+  --sh: 0 1px 2px rgba(0, 43, 73, 0.05), 0 6px 18px rgba(0, 43, 73, 0.06), 0 16px 36px rgba(0, 43, 73, 0.06);
+  --spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --back-out: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --out: cubic-bezier(0.22, 1, 0.36, 1);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
   :root {
-    --bg: #E8EDE4;
-    --panel: #F7F9F4;
-    --ink: #18231C;
-    --muted: #5B6B61;
-    --line: #CBD5C8;
-    --ok: #2F7D4F;
-    --bad: #B5432B;
-    --grid: rgba(24, 35, 28, .09);
-    color-scheme: light;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #101713;
-      --panel: #18211B;
-      --ink: #E6EDE4;
-      --muted: #94A599;
-      --line: #2A372E;
-      --ok: #5CC083;
-      --bad: #E27A63;
-      --grid: rgba(230, 237, 228, .09);
-      color-scheme: dark;
-    }
-  }
-  * { box-sizing: border-box; }
-  html { scroll-padding-top: 16px; }
-  body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--ink);
-    font-family: "Instrument Sans", system-ui, sans-serif;
-    line-height: 1.5;
-  }
-  main { max-width: 1040px; margin: 0 auto; padding: 28px 20px 48px; }
-  header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
-  h1 {
-    font-family: "Bricolage Grotesque", system-ui, sans-serif;
-    font-weight: 700;
-    font-size: clamp(2rem, 5vw, 3rem);
-    line-height: 1.05;
-    letter-spacing: -.02em;
-    margin: 0 0 4px;
-  }
-  .sub { color: var(--muted); margin: 0; }
-  .status {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 6px 14px; border: 1px solid var(--line); border-radius: 999px;
-    background: var(--panel); font-weight: 500; font-size: .95rem;
-  }
-  .status i { width: 9px; height: 9px; border-radius: 50%; background: var(--muted); }
-  .status.on i { background: var(--ok); }
-  .status.off i { background: var(--bad); }
+    --bg: #050E15;
+    --card: #0C1B27;
+    --card-alt: #102332;
+    --ink: #EAF3F8;
+    --muted: #93AEC2;
+    --line: rgba(147, 174, 194, 0.16);
+    --fill: rgba(120, 195, 225, 0.12);
+    --glass: rgba(5, 14, 21, 0.84);
+    --acc: #2CE6C5;
 
-  .range { display: flex; gap: 6px; margin: 0 0 16px; }
-  .range button {
-    font: inherit; font-size: .9rem; color: var(--ink); background: transparent;
-    border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; cursor: pointer;
-  }
-  .range button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-  button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+    --ok: #34D399;
+    --ok-bg: rgba(52, 211, 153, 0.16);
+    --warn: #FBBF24;
+    --warn-bg: rgba(251, 191, 36, 0.16);
+    --bad: #F87171;
+    --bad-bg: rgba(248, 113, 113, 0.18);
+    --info: #60A5FA;
+    --info-bg: rgba(96, 165, 250, 0.16);
 
-  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-  @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
-  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px 18px 12px; }
-  .panel h2 { margin: 0; font-size: 1rem; font-weight: 600; color: var(--muted); }
-  .value {
-    font-family: "Bricolage Grotesque", system-ui, sans-serif;
-    font-weight: 700; font-size: clamp(2.6rem, 7vw, 3.8rem);
-    line-height: 1.1; letter-spacing: -.02em; font-variant-numeric: tabular-nums;
+    --sh: 0 1px 2px rgba(0, 0, 0, 0.45), 0 8px 22px rgba(0, 0, 0, 0.52), 0 20px 44px rgba(0, 0, 0, 0.58);
+    color-scheme: dark;
   }
-  .value small { font-size: .38em; font-weight: 500; color: var(--muted); margin-left: 6px; letter-spacing: 0; }
-  .minmax { color: var(--muted); font-size: .88rem; margin: 0 0 8px; min-height: 1.3em; }
-  .chart { position: relative; height: 150px; }
-  .empty { color: var(--muted); margin-top: 20px; display: none; }
-  footer { color: var(--muted); font-size: .85rem; margin-top: 24px; }
-  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+}
+
+body[data-tone="warn"] { --tone: #FBBF24; }
+body[data-tone="bad"]  { --tone: #F87171; }
+body[data-tone="info"] { --tone: #60A5FA; }
+
+*, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html {
+  scroll-padding-top: 68px;
+  overflow-x: clip;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 15px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  overflow-x: clip;
+  width: 100%;
+}
+
+.amb {
+  position: fixed;
+  top: -220px;
+  left: 50%;
+  width: 820px;
+  max-width: 140vw;
+  height: 420px;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--pb-aqua), var(--pb-cyan));
+  filter: blur(125px);
+  opacity: 0.14;
+  z-index: -1;
+  pointer-events: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  text-align: inherit;
+}
+button:focus-visible {
+  outline: 3px solid var(--acc);
+  outline-offset: 2px;
+}
+h1, h2, h3, p { margin: 0; }
+
+/* =========================================================
+   1. SPLASH SCREEN & CONTENEDOR DE LOGO INSTITUCIONAL
+   ========================================================= */
+.intro:not(.done) { overflow: hidden; }
+
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background:
+    radial-gradient(640px 480px at 18% 15%, rgba(0, 168, 150, 0.34), transparent 70%),
+    radial-gradient(580px 460px at 88% 85%, rgba(0, 159, 227, 0.32), transparent 70%),
+    linear-gradient(155deg, #001D33 0%, #003459 52%, #004E64 100%);
+  transition: transform 0.55s var(--out), opacity 0.45s var(--out), visibility 0s 0.55s;
+  will-change: transform, opacity;
+}
+.curtain-up .splash { transform: translateY(-100%); pointer-events: none; }
+.done .splash { visibility: hidden; pointer-events: none; }
+
+.brand {
+  text-align: center;
+  padding: 6px 0 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo-wrap {
+  position: relative;
+  z-index: 110;
+  width: var(--logo-size);
+  height: var(--logo-size);
+  aspect-ratio: 1 / 1;
+  margin: 0 auto 12px;
+  flex-shrink: 0;
+  transform: translate(var(--dx, 0px), var(--dy, 0px)) scale(var(--s, 1));
+  transition: transform 0.55s var(--back-out);
+  will-change: transform;
+}
+.nt .logo-wrap { transition: none !important; }
+
+.logo-box {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1 / 1;
+  padding: var(--logo-pad);
+  border-radius: var(--logo-radius);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #FFFFFF 0%, #EBF7FA 100%);
+  color: var(--pb-navy);
+  box-shadow: 0 10px 26px rgba(0, 27, 46, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.65) inset;
+}
+
+.logo-box > svg,
+.logo-box > img,
+.logo-box > picture,
+.logo-box > picture > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+.intro:not(.jumped) .logo-box { animation: logoPop 0.42s var(--back-out) both; }
+
+@keyframes logoPop {
+  0%   { opacity: 0; transform: scale(0.6); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.title-block {
+  position: relative;
+  z-index: 105;
+  max-width: 640px;
+  transition: opacity 0.42s var(--out) 0.1s, transform 0.48s var(--spring) 0.1s, color 0.35s var(--out);
+}
+.intro:not(.jumped) .title-block { opacity: 0; transform: translateY(10px); }
+.intro.jumped:not(.curtain-up) .title-block { color: #FFFFFF; }
+
+.uni-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--acc);
+  margin-bottom: 4px;
+  transition: color 0.35s var(--out);
+}
+.intro.jumped:not(.curtain-up) .uni-badge { color: #5CEAD2; }
+
+.title {
+  font-size: clamp(1.45rem, 4.6vw, 2.55rem);
+  font-weight: 760;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+}
+.tag {
+  color: var(--muted);
+  margin-top: 5px;
+  font-size: clamp(0.84rem, 2.2vw, 0.96rem);
+  transition: color 0.35s var(--out);
+}
+.intro.jumped:not(.curtain-up) .tag { color: rgba(255, 255, 255, 0.84); }
+
+/* Indicador animado sutil de deslizamiento (reemplaza al botón Iniciar) */
+.scroll-hint {
+  margin-top: 12px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  opacity: 0.82;
+  transition: opacity 0.35s var(--out), transform 0.35s var(--out), color 0.2s;
+}
+.scroll-hint:hover {
+  opacity: 1;
+  color: var(--acc);
+}
+.scroll-hint.is-scrolled {
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+}
+.scroll-hint-chevrons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 0;
+  animation: scrollBounce 1.9s ease-in-out infinite;
+}
+.scroll-hint svg {
+  width: 17px;
+  height: 17px;
+  stroke: var(--acc);
+}
+.scroll-hint svg + svg {
+  margin-top: -10px;
+  opacity: 0.45;
+}
+@keyframes scrollBounce {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(5px); }
+}
+
+.intro:not(.curtain-up) .rise { opacity: 0; transform: translateY(14px); }
+.intro.curtain-up .rise {
+  animation: riseIn 0.52s var(--out) backwards;
+  animation-delay: calc(40ms + var(--k, 0) * 45ms);
+}
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================================
+   2. BARRA SUPERIOR (GLASSMORPHISM)
+   ========================================================= */
+.top {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--glass);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--line);
+  padding: calc(env(safe-area-inset-top, 0px) + 8px) clamp(12px, 3vw, 28px) 8px;
+}
+.top > div {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 36px;
+}
+.top-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.3s, transform 0.4s var(--spring);
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.top-brand.show { opacity: 1; transform: none; }
+.top-mini-logo {
+  width: 32px;
+  height: 32px;
+  aspect-ratio: 1 / 1;
+  padding: 2px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--pb-navy), var(--pb-aqua));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.top-mini-logo svg, .top-mini-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.top h1 {
+  font-size: 0.92rem;
+  font-weight: 680;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.top-title-short { display: none; }
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--fill);
+  font-size: 0.78rem;
+  font-weight: 620;
+  white-space: nowrap;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.pill i { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
+.pill.on { color: var(--ok); background: var(--ok-bg); }
+.pill.on i { background: var(--ok); animation: pulse 2s infinite; }
+.pill.off { color: var(--bad); background: var(--bad-bg); }
+.pill.off i { background: var(--bad); }
+@keyframes pulse {
+  0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 60%, transparent); }
+  100% { box-shadow: 0 0 0 6px transparent; }
+}
+
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px clamp(12px, 3vw, 28px) calc(52px + env(safe-area-inset-bottom, 0px));
+}
+.sec-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 12px;
+  margin: 28px 2px 12px;
+}
+.sec {
+  font-size: clamp(1.08rem, 2.2vw, 1.24rem);
+  font-weight: 720;
+  letter-spacing: -0.025em;
+}
+.sec-sub {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+/* =========================================================
+   3. SELECTOR DE UBICACIONES
+   ========================================================= */
+.locs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
+  gap: 12px;
+}
+.loc {
+  position: relative;
+  background: var(--card);
+  border-radius: 20px;
+  padding: 13px 15px;
+  box-shadow: var(--sh);
+  border: 2px solid transparent;
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  min-height: 76px;
+  transition: transform 0.35s var(--spring), box-shadow 0.35s var(--spring), border-color 0.25s, background 0.25s;
+}
+.loc:hover { transform: translateY(-2px); }
+.loc:active { transform: scale(0.985); }
+
+.loc[aria-pressed="true"] {
+  border-color: var(--acc);
+  background: linear-gradient(145deg, var(--card) 58%, color-mix(in srgb, var(--acc) 9%, var(--card)));
+  box-shadow: 0 10px 26px color-mix(in srgb, var(--acc) 18%, transparent), var(--sh);
+}
+.art {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+  background: var(--card-alt);
+  flex-shrink: 0;
+}
+.art svg {
+  width: 48px;
+  height: 48px;
+  transition: transform 0.45s var(--spring);
+}
+.loc[aria-pressed="true"] .art svg { transform: scale(1.06) translateY(-1px); }
+
+.loc-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.loc-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.loc strong {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.active-tag {
+  display: none;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.68rem;
+  font-weight: 720;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--pb-navy);
+  color: #FFFFFF;
+  flex-shrink: 0;
+}
+.active-tag svg { width: 11px; height: 11px; }
+@media (prefers-color-scheme: dark) {
+  .active-tag { background: var(--acc); color: #04151F; }
+}
+.loc[aria-pressed="true"] .active-tag { display: inline-flex; }
+
+.ls {
+  font-size: 0.78rem;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.live {
+  font-style: normal;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 4px;
+  font-size: 0.77rem;
+  font-weight: 620;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.live svg { width: 13px; height: 13px; flex-shrink: 0; }
+.live.on { color: var(--ok); }
+.live.stale-loc { color: var(--warn); }
+.live.off { color: var(--bad); }
+
+.steam { animation: steam 3s ease-in-out infinite; }
+.steam:nth-of-type(2) { animation-delay: 0.9s; }
+.steam:nth-of-type(3) { animation-delay: 1.8s; }
+@keyframes steam {
+  0%   { opacity: 0; transform: translateY(4px); }
+  40%  { opacity: 0.85; }
+  100% { opacity: 0; transform: translateY(-6px); }
+}
+
+/* =========================================================
+   4. TARJETA PRINCIPAL (HERO) — RESUMEN EJECUTIVO DETALLADO
+   ========================================================= */
+.hero {
+  margin-top: 16px;
+  border-radius: 26px;
+  padding: 24px 28px;
+  box-shadow: var(--sh);
+  color: #FFFFFF;
+  background: linear-gradient(145deg, #002642 0%, #005273 58%, #00827A 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  position: relative;
+  overflow: hidden;
+  transition: opacity 0.35s;
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  right: -60px;
+  top: -80px;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(92, 234, 210, 0.18), transparent 70%);
+  pointer-events: none;
+}
+.hero.stale { opacity: 0.86; }
+
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+}
+.hero-loc-group {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.hero-loc-name {
+  font-size: 0.92rem;
+  font-weight: 720;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #FFFFFF;
+}
+.hero-loc-sub {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.74);
+}
+.hero-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  font-weight: 560;
+  color: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.12);
+  padding: 4px 10px;
+  border-radius: 999px;
+  transition: background 0.25s, color 0.25s;
+}
+.hero-time.is-offline {
+  background: rgba(251, 191, 36, 0.22);
+  color: #FDE68A;
+  box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.42) inset;
+}
+.hero-time svg { width: 13px; height: 13px; opacity: 0.85; flex-shrink: 0; }
+
+.hero-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(300px, 1fr);
+  gap: 22px;
+  align-items: stretch;
+}
+
+.hero-status-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+.general-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  align-self: flex-start;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 720;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.24) inset;
+  color: #FFFFFF;
+}
+.general-pill[data-level="ok"]   { background: rgba(44, 230, 197, 0.22); color: #A7F3D0; box-shadow: 0 0 0 1px rgba(44, 230, 197, 0.45) inset; }
+.general-pill[data-level="warn"] { background: rgba(251, 191, 36, 0.24); color: #FDE68A; box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.5) inset; }
+.general-pill[data-level="bad"]  { background: rgba(248, 113, 113, 0.26); color: #FECACA; box-shadow: 0 0 0 1px rgba(248, 113, 113, 0.55) inset; }
+.general-pill[data-level="info"] { background: rgba(96, 165, 250, 0.24); color: #DBEAFE; box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.5) inset; }
+.general-pill svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+.verdict-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+.status-viz {
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.14);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18) inset;
+}
+.eq {
+  display: flex;
+  align-items: flex-end;
+  gap: 2.5px;
+  height: 18px;
+}
+.eq span {
+  width: 3px;
+  border-radius: 3px;
+  background: var(--tone);
+  animation: eqBounce 0.75s ease-in-out infinite alternate;
+}
+.eq span:nth-child(1) { height: 7px; animation-delay: 0s; }
+.eq span:nth-child(2) { height: 16px; animation-delay: 0.18s; }
+.eq span:nth-child(3) { height: 11px; animation-delay: 0.34s; }
+.eq span:nth-child(4) { height: 18px; animation-delay: 0.12s; }
+.eq span:nth-child(5) { height: 9px; animation-delay: 0.28s; }
+@keyframes eqBounce { 0% { transform: scaleY(0.35); } 100% { transform: scaleY(1); } }
+
+.viz-svg {
+  width: 22px;
+  height: 22px;
+  stroke: var(--tone);
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.hero h2 {
+  font-size: clamp(1.32rem, 2.8vw, 1.88rem);
+  font-weight: 730;
+  letter-spacing: -0.03em;
+  line-height: 1.16;
+}
+.hero-title-action {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  text-align: left;
+}
+.hero-title-action:hover { text-decoration: underline; text-decoration-color: rgba(255, 255, 255, 0.55); text-underline-offset: 4px; }
+.hero-title-action:disabled, .status-viz:disabled { cursor: default; }
+.hero .sub {
+  color: rgba(255, 255, 255, 0.88);
+  margin-top: 7px;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+/* Listado compacto e interactivo de variables fuera de rango */
+.oor-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 2px;
+}
+.oor-wrap[hidden] { display: none; }
+.oor-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.oor-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 36px;
+  padding: 6px 11px;
+  border-radius: 11px;
+  font-size: 0.8rem;
+  font-weight: 620;
+  background: rgba(0, 18, 32, 0.38);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18) inset;
+  transition: background 0.2s, transform 0.22s var(--spring);
+  max-width: 100%;
+}
+.oor-chip:hover {
+  background: rgba(0, 18, 32, 0.56);
+  transform: translateY(-1px);
+}
+.oor-chip:active { transform: scale(0.98); }
+.oor-chip[data-tone="bad"]  {
+  background: rgba(127, 29, 29, 0.34);
+  color: #FECACA;
+  box-shadow: 0 0 0 1px rgba(248, 113, 113, 0.52) inset;
+}
+.oor-chip[data-tone="warn"] {
+  background: rgba(120, 53, 15, 0.32);
+  color: #FDE68A;
+  box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.48) inset;
+}
+.oor-chip[data-tone="info"] {
+  background: rgba(30, 58, 138, 0.32);
+  color: #DBEAFE;
+  box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.48) inset;
+}
+
+.oor-main {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.oor-main svg { width: 14px; height: 14px; flex-shrink: 0; }
+.oor-name {
+  font-weight: 700;
+  color: #FFFFFF;
+  white-space: nowrap;
+}
+.oor-state {
+  opacity: 0.92;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.oor-val {
+  font-weight: 720;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #FFFFFF;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.hero-retry {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  align-self: flex-start;
+  min-height: 38px;
+  padding: 7px 14px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.18);
+  color: #FFFFFF;
+  font-size: 0.82rem;
+  font-weight: 660;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.28) inset;
+  transition: background 0.2s;
+}
+.hero-retry:hover { background: rgba(255, 255, 255, 0.28); }
+.hero-retry[hidden] { display: none; }
+
+/* Bloque térmico protagonista */
+.thermal-panel {
+  background: rgba(0, 18, 32, 0.28);
+  border-radius: 20px;
+  padding: 18px 20px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14) inset;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 11px;
+  min-width: 0;
+}
+.thermal-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+.thermal-label {
+  font-size: 0.74rem;
+  font-weight: 680;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.76);
+}
+.temp {
+  font-size: clamp(2.55rem, 5.2vw, 4.1rem);
+  font-weight: 660;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  margin-top: 3px;
+  white-space: nowrap;
+}
+.temp small {
+  font-size: 0.42em;
+  font-weight: 560;
+  color: rgba(255, 255, 255, 0.78);
+  margin-left: 2px;
+  letter-spacing: 0;
+}
+.temp-state-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  white-space: nowrap;
+}
+.temp-state-pill svg { width: 13px; height: 13px; flex-shrink: 0; }
+.temp-state-pill[data-tone="ok"]   { background: rgba(44, 230, 197, 0.24); color: #A7F3D0; }
+.temp-state-pill[data-tone="warn"] { background: rgba(251, 191, 36, 0.25); color: #FDE68A; }
+.temp-state-pill[data-tone="bad"]  { background: rgba(248, 113, 113, 0.28); color: #FECACA; }
+.temp-state-pill[data-tone="info"] { background: rgba(96, 165, 250, 0.25); color: #DBEAFE; }
+
+.feel {
+  color: rgba(255, 255, 255, 0.86);
+  font-weight: 540;
+  font-size: 0.83rem;
+  line-height: 1.35;
+}
+.feel[hidden] { display: none; }
+
+/* =========================================================
+   INDICADOR TÉRMICO PROPORCIONAL (10–20° | 20–27° | 27–30° | 30–40°)
+   ========================================================= */
+.temp-gauge {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 2px;
+}
+.gauge-track-wrap {
+  position: relative;
+  padding-top: 7px;
+}
+.gauge-segments {
+  display: grid;
+  grid-template-columns: 10fr 7fr 3fr 10fr;
+  gap: 2px;
+  height: 11px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.28);
+}
+.g-seg {
+  height: 100%;
+  opacity: 0.55;
+  transition: opacity 0.3s, filter 0.3s;
+}
+.g-seg.is-current {
+  opacity: 1;
+  filter: brightness(1.08);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.45) inset;
+}
+.g-cold { background: var(--seg-info); }
+.g-ok   { background: var(--seg-ok); }
+.g-warn { background: var(--seg-warn); }
+.g-bad  { background: var(--seg-bad); }
+
+.gauge-marker {
+  position: absolute;
+  top: 2px;
+  left: var(--pos, 50%);
+  width: 19px;
+  height: 19px;
+  margin-left: -9.5px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  border: 3.5px solid #002642;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  transition: left 0.75s var(--spring), opacity 0.25s;
+  pointer-events: none;
+}
+
+.gauge-axis {
+  position: relative;
+  height: 15px;
+  font-size: 0.68rem;
+  font-weight: 640;
+  color: rgba(255, 255, 255, 0.74);
+}
+.gauge-axis span {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+.gauge-axis span:first-child { left: 0; transform: none; }
+.gauge-axis span:last-child  { right: 0; left: auto; transform: none; }
+
+.gauge-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 10px;
+  margin-top: 2px;
+  font-size: 0.69rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+.gl-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.gl-item i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   5. TARJETAS BENTO DE MEDICIONES (SIN SUPERPOSICIONES)
+   ========================================================= */
+.bento {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.tile {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 15px 16px;
+  box-shadow: var(--sh);
+  border: 2px solid transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+  min-height: 142px;
+  transition: transform 0.35s var(--spring), box-shadow 0.35s var(--spring), border-color 0.25s, background 0.25s;
+}
+.tile[hidden] { display: none; }
+.tile:hover { transform: translateY(-2px); }
+.tile:active { transform: scale(0.985); }
+
+.tile[aria-pressed="true"] {
+  border-color: var(--acc);
+  background: linear-gradient(160deg, var(--card) 62%, color-mix(in srgb, var(--acc) 9%, var(--card)));
+  box-shadow: 0 10px 26px color-mix(in srgb, var(--acc) 18%, transparent), var(--sh);
+}
+
+/* Fila superior: ícono a la izquierda y píldora de gráfica a la derecha */
+.tile-head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.tile-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+.ic {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--c) 14%, transparent);
+  color: var(--c);
+  flex-shrink: 0;
+}
+.ic svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.th-labels {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 6px;
+  min-width: 0;
+  width: 100%;
+}
+.th-name {
+  font-weight: 680;
+  font-size: 0.9rem;
+  color: var(--ink);
+  line-height: 1.22;
+  overflow-wrap: break-word;
+}
+.th-tag {
+  font-size: 0.67rem;
+  font-weight: 620;
+  color: var(--muted);
+  letter-spacing: 0.01em;
+}
+
+.tile-chart-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.69rem;
+  font-weight: 680;
+  padding: 3.5px 8px;
+  border-radius: 999px;
+  color: var(--muted);
+  background: var(--fill);
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.2s, color 0.2s;
+}
+.tile[aria-pressed="true"] .tile-chart-btn {
+  background: var(--pb-navy);
+  color: #FFFFFF;
+}
+@media (prefers-color-scheme: dark) {
+  .tile[aria-pressed="true"] .tile-chart-btn {
+    background: var(--acc);
+    color: #04151F;
+  }
+}
+.tile-chart-btn svg { width: 11px; height: 11px; stroke: currentColor; fill: none; stroke-width: 2.2; flex-shrink: 0; }
+
+.tile-current {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+.val {
+  font-size: clamp(1.65rem, 2.6vw, 2.2rem);
+  font-weight: 730;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  white-space: nowrap;
+}
+.val small {
+  font-size: 0.44em;
+  font-weight: 600;
+  color: var(--muted);
+  margin-left: 3px;
+  letter-spacing: 0;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.74rem;
+  font-weight: 680;
+  padding: 3px 9px;
+  border-radius: 999px;
+  color: var(--t);
+  background: var(--t-bg);
+  max-width: 100%;
+}
+.badge span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.badge svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+.badge:empty { display: none; }
+.t-ok   { --t: var(--ok);   --t-bg: var(--ok-bg); }
+.t-warn { --t: var(--warn); --t-bg: var(--warn-bg); }
+.t-bad  { --t: var(--bad);  --t-bg: var(--bad-bg); }
+.t-info { --t: var(--info); --t-bg: var(--info-bg); }
+
+.tile-mm {
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2px 6px;
+  font-size: 0.72rem;
+  font-weight: 560;
+  color: var(--muted);
+}
+.tile-mm:empty, .tile-mm[hidden] { display: none; }
+
+/* =========================================================
+   6. SECCIÓN DE HISTORIAL Y GRÁFICAS
+   ========================================================= */
+.detail {
+  background: var(--card);
+  border-radius: 24px;
+  box-shadow: var(--sh);
+  padding: 22px 24px;
+  border: 1px solid var(--line);
+  min-width: 0;
+}
+.dh {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.tabs {
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  max-width: 100%;
+  touch-action: pan-x pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 15px;
+  min-height: 40px;
+  border-radius: 999px;
+  background: var(--fill);
+  font-weight: 620;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.25s, color 0.25s, transform 0.25s var(--spring);
+}
+.tab:active { transform: scale(0.96); }
+.tab[hidden] { display: none; }
+.tab[aria-pressed="true"] {
+  background: var(--pb-navy);
+  color: #FFFFFF;
+}
+@media (prefers-color-scheme: dark) {
+  .tab[aria-pressed="true"] {
+    background: var(--acc);
+    color: #04151F;
+  }
+}
+
+.seg {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: var(--fill);
+  border-radius: 12px;
+  padding: 3px;
+  min-width: 210px;
+}
+.seg i {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc((100% - 6px) / 3);
+  background: var(--card);
+  border-radius: 9px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.14);
+  transform: translateX(calc(var(--i, 0) * 100%));
+  transition: transform 0.45s var(--spring);
+}
+.seg button {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 7px 0;
+  min-height: 36px;
+  font-size: 0.84rem;
+  font-weight: 650;
+  color: var(--muted);
+  transition: color 0.2s;
+}
+.seg button[aria-pressed="true"] { color: var(--ink); }
+
+.chart-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 12px;
+  margin-bottom: 12px;
+}
+.dt {
+  font-size: 1.06rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.d-meta {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.chart {
+  position: relative;
+  height: 290px;
+  width: 100%;
+  min-width: 0;
+}
+.none {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  padding: 18px;
+  border-radius: 16px;
+  background: var(--card-alt);
+  border: 1px dashed var(--line);
+  color: var(--muted);
+  font-size: 0.88rem;
+  pointer-events: none;
+}
+.none svg { width: 24px; height: 24px; opacity: 0.7; }
+
+.chart-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.stat-box {
+  background: var(--card-alt);
+  border-radius: 14px;
+  padding: 11px 13px;
+  min-width: 0;
+}
+.stat-label {
+  font-size: 0.73rem;
+  font-weight: 640;
+  color: var(--muted);
+}
+.stat-val {
+  font-size: 1.08rem;
+  font-weight: 710;
+  letter-spacing: -0.02em;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.stat-sub {
+  font-size: 0.71rem;
+  color: var(--muted);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.foot {
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-align: center;
+  margin-top: 28px;
+}
+
+/* =========================================================
+   7. BREAKPOINTS FLUIDOS (320px – 1920px+)
+   ========================================================= */
+@media (max-width: 1120px) {
+  .bento {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 840px) {
+  .hero {
+    padding: 20px 22px;
+  }
+  .hero-main {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .chart { height: 255px; }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --logo-size: 78px;
+    --logo-radius: 20px;
+    --logo-pad: 2px;
+  }
+
+  html { scroll-padding-top: 58px; }
+
+  .top {
+    padding: calc(env(safe-area-inset-top, 0px) + 7px) 14px 7px;
+  }
+  .top h1 { font-size: 0.86rem; }
+  .pill { padding: 4px 10px; font-size: 0.74rem; gap: 6px; }
+
+  main {
+    padding: 12px 14px calc(38px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .brand { padding: 4px 0 6px; }
+  .logo-wrap { margin-bottom: 9px; }
+  .uni-badge { font-size: 0.67rem; margin-bottom: 2px; }
+  .scroll-hint { margin-top: 9px; font-size: 0.72rem; }
+
+  .sec-head { margin: 22px 0 10px; }
+  .sec-sub { font-size: 0.76rem; }
+
+  .locs {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 14px;
+    touch-action: pan-x pan-y;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 10px;
+    margin: 0 -14px;
+    padding: 2px 14px 6px;
+  }
+  .locs::-webkit-scrollbar { display: none; }
+  .loc {
+    flex: 0 0 auto;
+    width: clamp(214px, 68vw, 246px);
+    scroll-snap-align: start;
+    border-radius: 18px;
+    padding: 11px 12px;
+    grid-template-columns: 46px minmax(0, 1fr);
+    gap: 10px;
+    min-height: 68px;
+  }
+  .art { width: 46px; height: 46px; border-radius: 12px; }
+  .art svg { width: 40px; height: 40px; }
+  .loc strong { font-size: 0.94rem; }
+  .ls { font-size: 0.73rem; }
+  .live { font-size: 0.73rem; margin-top: 3px; }
+
+  .hero {
+    margin-top: 12px;
+    border-radius: 22px;
+    padding: 16px 16px;
+    gap: 13px;
+  }
+  .hero-meta {
+    padding-bottom: 9px;
+    gap: 6px;
+  }
+  .hero-loc-name { font-size: 0.82rem; }
+  .hero-loc-sub { font-size: 0.74rem; }
+  .hero-time { font-size: 0.72rem; padding: 3px 9px; }
+
+  .hero-status-box { gap: 10px; }
+  .general-pill { font-size: 0.7rem; padding: 4px 10px; }
+  .verdict-row { gap: 10px; }
+  .status-viz { width: 38px; height: 38px; border-radius: 11px; }
+  .viz-svg { width: 19px; height: 19px; }
+  .hero .sub { font-size: 0.83rem; margin-top: 5px; }
+
+  .thermal-panel {
+    border-radius: 16px;
+    padding: 14px 14px;
+    gap: 9px;
+  }
+  .thermal-label { font-size: 0.69rem; }
+  .temp-state-pill { font-size: 0.72rem; padding: 4px 9px; }
+  .feel { font-size: 0.78rem; }
+
+  .gauge-legend {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 3px 8px;
+    font-size: 0.68rem;
+  }
+
+  .bento {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .tile {
+    border-radius: 18px;
+    padding: 12px 12px;
+    gap: 8px;
+    min-height: 126px;
+  }
+  .tile-head { gap: 6px; }
+  .ic { width: 26px; height: 26px; border-radius: 8px; }
+  .ic svg { width: 14px; height: 14px; }
+  .th-name { font-size: 0.84rem; }
+  .th-tag { font-size: 0.63rem; }
+  .tile-chart-btn { padding: 3px 7px; font-size: 0.65rem; }
+  .val { font-size: clamp(1.48rem, 5.8vw, 1.85rem); }
+  .badge { font-size: 0.7rem; padding: 2.5px 8px; }
+  .tile-mm { font-size: 0.68rem; padding-top: 6px; }
+
+  .detail {
+    border-radius: 20px;
+    padding: 16px 14px;
+  }
+  .dh {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .tabs {
+    margin: 0 -14px;
+    padding: 2px 14px 4px;
+  }
+  .tab {
+    padding: 7px 13px;
+    min-height: 38px;
+    font-size: 0.81rem;
+  }
+  .seg {
+    width: 100%;
+    min-width: 0;
+  }
+  .seg button {
+    min-height: 38px;
+    font-size: 0.82rem;
+  }
+  .chart-header { margin-bottom: 10px; }
+  .dt { font-size: 0.96rem; }
+  .d-meta { font-size: 0.74rem; }
+  .chart { height: 215px; }
+  .chart-stats {
+    gap: 7px;
+    margin-top: 12px;
+    padding-top: 12px;
+  }
+  .stat-box { padding: 8px 9px; border-radius: 12px; }
+  .stat-label { font-size: 0.68rem; }
+  .stat-val { font-size: 0.92rem; }
+  .stat-sub { font-size: 0.65rem; }
+}
+
+@media (max-width: 480px) {
+  .oor-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .oor-chip {
+    width: 100%;
+    padding: 6px 10px;
+    font-size: 0.77rem;
+  }
+  .top-title-full { display: none; }
+  .top-title-short { display: inline; }
+}
+
+@media (max-width: 380px) {
+  .gauge-axis { font-size: 0.64rem; }
+  .gauge-axis .ax-27 { transform: translateX(-64%); }
+  .gauge-axis .ax-30 { transform: translateX(-36%); }
+}
+
+@media (max-width: 349px) {
+  :root {
+    --logo-size: 64px;
+    --logo-radius: 17px;
+    --logo-pad: 1px;
+  }
+  .top { padding-inline: 10px; }
+  .pill { padding: 4px 8px; font-size: 0.7rem; gap: 5px; }
+  main { padding-inline: 10px; }
+  .locs { margin: 0 -10px; padding-inline: 10px; }
+  .loc { width: 206px; }
+  .hero { padding: 14px 13px; border-radius: 20px; }
+  .thermal-panel { padding: 12px 12px; }
+  .bento { grid-template-columns: 1fr; }
+  .tile { min-height: auto; padding: 12px 13px; }
+  .detail { padding: 14px 12px; }
+  .tabs { margin: 0 -12px; padding-inline: 12px; }
+  .chart { height: 195px; }
+  .chart-stats { gap: 5px; }
+  .stat-box { padding: 7px 6px; }
+  .stat-val { font-size: 0.85rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
 </style>
 </head>
 <body>
-<main>
-  <header>
-    <div>
-      <h1>Medio Ambiente</h1>
-      <p class="sub">Sensores del ESP32-S3 en tiempo real</p>
-    </div>
-    <div id="status" class="status" role="status"><i></i><span id="statusText">Conectando…</span></div>
-  </header>
+<div class="amb" aria-hidden="true"></div>
+<div class="splash" id="splash" aria-hidden="true"></div>
 
-  <div class="range" role="group" aria-label="Rango del historial">
-    <button type="button" data-n="60" aria-pressed="true">Última hora</button>
-    <button type="button" data-n="360" aria-pressed="false">6 horas</button>
-    <button type="button" data-n="1440" aria-pressed="false">24 horas</button>
+<header class="top" id="topHeader">
+  <div>
+    <div class="top-brand" id="topBrand">
+      <div class="top-mini-logo" aria-hidden="true">
+        <img src="images/Pascual%20Blanco.png" alt="">
+      </div>
+      <h1>
+        <span class="top-title-full">Monitor Ambiental · Pascual Bravo</span>
+        <span class="top-title-short">Monitor Ambiental</span>
+      </h1>
+    </div>
+    <div class="pill" id="status" role="status" aria-live="polite"><i></i><span id="statusText">Conectando…</span></div>
+  </div>
+</header>
+
+<main>
+  <div class="brand">
+    <!-- Logo oficial en azul sobre el fondo claro del contenedor. -->
+    <div class="logo-wrap" id="logoWrap">
+      <div class="logo-box" id="logoSlot" data-logo-slot="university" title="I.U. Pascual Bravo">
+        <img src="images/Pascual%20Azul.png" alt="Logo de la Institución Universitaria Pascual Bravo">
+      </div>
+    </div>
+
+    <div class="title-block" id="brandTitle">
+      <span class="uni-badge">I.U. Pascual Bravo · Medellín</span>
+      <h1 class="title">Monitor Ambiental</h1>
+      <p class="tag">Estado ambiental del campus en tiempo real</p>
+      <button type="button" class="scroll-hint" id="scrollHint" aria-label="Desliza hacia abajo para explorar las ubicaciones">
+        <span>Desliza para explorar</span>
+        <span class="scroll-hint-chevrons" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </button>
+    </div>
   </div>
 
-  <section class="grid" id="grid"></section>
-  <p class="empty" id="empty">Aún no hay datos. Enciende el ESP32 y espera unos 20 segundos.</p>
-  <footer>Datos de Firebase Realtime Database. Se guarda un punto del historial cada minuto.</footer>
+  <div class="sec-head rise" id="ubicacionesSection" style="margin-top:14px;--k:0">
+    <h2 class="sec">Ubicaciones</h2>
+    <span class="sec-sub">Elige un espacio del campus</span>
+  </div>
+  <div class="locs rise" id="locs" style="--k:1" role="group" aria-label="Ubicaciones del campus"></div>
+
+  <!-- TARJETA PRINCIPAL (HERO): RESUMEN EJECUTIVO -->
+  <section class="hero rise" id="hero" style="--k:2" aria-live="polite" tabindex="-1">
+    <div class="hero-meta">
+      <div class="hero-loc-group">
+        <span class="hero-loc-name" id="hLoc">—</span>
+        <span class="hero-loc-sub" id="hLocSub"></span>
+      </div>
+      <div class="hero-time" id="hTime">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span id="hTimeText">Esperando lectura…</span>
+      </div>
+    </div>
+
+    <div class="hero-main">
+      <!-- Estado ambiental general + Prioridad y desglose de anomalías -->
+      <div class="hero-status-box">
+        <div class="general-pill" id="hGeneralPill" data-level="info">
+          <span id="hGeneralIcon"></span>
+          <span id="hGeneralLabel">Analizando ambiente</span>
+        </div>
+
+        <div class="verdict-row">
+          <button type="button" class="status-viz" id="hViz" aria-label="Ver historial de la medición principal" disabled></button>
+          <div>
+            <h2><button type="button" class="hero-title-action" id="hTitle" disabled>Leyendo el ambiente…</button></h2>
+            <p class="sub" id="hSub">Conectando con los sensores de esta ubicación.</p>
+          </div>
+        </div>
+
+        <div class="oor-wrap" id="hOorWrap" hidden>
+          <div class="oor-grid" id="hAlertsList" aria-label="Mediciones fuera de rango"></div>
+        </div>
+
+        <button type="button" class="hero-retry" id="hRetry" hidden>Reintentar conexión</button>
+      </div>
+
+      <!-- Temperatura actual + Sensación térmica estimada + Indicador proporcional -->
+      <div class="thermal-panel">
+        <div class="thermal-top">
+          <div>
+            <div class="thermal-label">Temperatura del aire</div>
+            <div class="temp" id="hTemp">--<small>°C</small></div>
+          </div>
+          <div class="temp-state-pill" id="hTempState" data-tone="info">
+            <span id="hTempStateIcon"></span>
+            <span id="hTempStateText">Sin lectura</span>
+          </div>
+        </div>
+
+        <p class="feel" id="hFeel" hidden></p>
+
+        <div class="temp-gauge" id="tempGauge" role="img" aria-label="Indicador proporcional de temperatura entre 10 y 40 grados Celsius">
+          <div class="gauge-track-wrap">
+            <div class="gauge-segments" id="gaugeSegments">
+              <div class="g-seg g-cold" id="seg-cold"></div>
+              <div class="g-seg g-ok"   id="seg-ok"></div>
+              <div class="g-seg g-warn" id="seg-warn"></div>
+              <div class="g-seg g-bad"  id="seg-bad"></div>
+            </div>
+            <div class="gauge-marker" id="gaugeMarker" style="--pos: 50%; opacity: 0;"></div>
+          </div>
+          <div class="gauge-axis" aria-hidden="true">
+            <span>10°</span>
+            <span style="left: 33.33%">20°</span>
+            <span class="ax-27" style="left: 56.67%">27°</span>
+            <span class="ax-30" style="left: 66.67%">30°</span>
+            <span>40°</span>
+          </div>
+          <div class="gauge-legend" aria-hidden="true">
+            <span class="gl-item"><i style="background: var(--seg-info)"></i>Baja (&lt;20°)</span>
+            <span class="gl-item"><i style="background: var(--seg-ok)"></i>Adecuada (20–27°)</span>
+            <span class="gl-item"><i style="background: var(--seg-warn)"></i>Elevada (27–30°)</span>
+            <span class="gl-item"><i style="background: var(--seg-bad)"></i>Excesiva (≥30°)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TARJETAS DE MEDICIONES -->
+  <div class="sec-head rise" style="--k:3">
+    <h2 class="sec">Mediciones</h2>
+    <span class="sec-sub">Selecciona una tarjeta para ver su historial</span>
+  </div>
+  <section class="bento rise" id="bento" style="--k:4"></section>
+
+  <!-- SECCIÓN DE HISTORIAL Y GRÁFICAS -->
+  <div class="sec-head rise" id="historialSection" style="--k:5">
+    <h2 class="sec">Historial</h2>
+    <span class="sec-sub">Evolución temporal de cada variable</span>
+  </div>
+  <section class="detail rise" style="--k:6">
+    <div class="dh">
+      <div class="tabs" id="tabs" role="group" aria-label="Variable a graficar"></div>
+      <div class="seg" id="seg" role="group" aria-label="Intervalo de tiempo">
+        <i></i>
+        <button type="button" data-n="60" aria-pressed="true">1 h</button>
+        <button type="button" data-n="360" aria-pressed="false">6 h</button>
+        <button type="button" data-n="1440" aria-pressed="false">24 h</button>
+      </div>
+    </div>
+
+    <div class="chart-header">
+      <p class="dt" id="dTitle">Temperatura (°C)</p>
+      <p class="d-meta" id="dMeta">Última hora</p>
+    </div>
+
+    <div class="chart">
+      <canvas id="chart" role="img" aria-label="Gráfica del historial de mediciones"></canvas>
+      <div class="none" id="none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <span id="noneText">Reuniendo datos del historial…</span>
+      </div>
+    </div>
+
+    <div class="chart-stats" id="chartStats">
+      <div class="stat-box">
+        <div class="stat-label">Promedio</div>
+        <div class="stat-val" id="stAvg">—</div>
+        <div class="stat-sub" id="stAvgSub">En el intervalo</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Mínimo</div>
+        <div class="stat-val" id="stMin">—</div>
+        <div class="stat-sub" id="stMinSub">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Máximo</div>
+        <div class="stat-val" id="stMax">—</div>
+        <div class="stat-sub" id="stMaxSub">—</div>
+      </div>
+    </div>
+  </section>
+
+  <p class="foot">I.U. Pascual Bravo · Sistema de monitoreo ambiental del campus.</p>
 </main>
+
+<script>
+(function () {
+  var b = document.body, w = document.getElementById("logoWrap");
+  var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var tJump, tCurtain, tDone;
+
+  function setTransform(x, y, s) {
+    w.style.setProperty("--dx", x);
+    w.style.setProperty("--dy", y);
+    w.style.setProperty("--s", s);
+  }
+
+  function centerLogo() {
+    setTransform("0px", "0px", "1");
+    var r = w.getBoundingClientRect();
+    if (!r.width) return;
+    var dx = (innerWidth / 2) - (r.left + r.width / 2);
+    var dy = (innerHeight / 2) - (r.top + r.height / 2);
+    var targetSize = Math.min(112, innerWidth * 0.32);
+    var scale = targetSize / r.width;
+    setTransform(dx + "px", dy + "px", String(scale));
+  }
+
+  function finishIntroImmediately() {
+    clearTimeout(tJump);
+    clearTimeout(tCurtain);
+    clearTimeout(tDone);
+    b.classList.remove("nt");
+    setTransform("0px", "0px", "1");
+    b.classList.add("jumped", "curtain-up", "done");
+  }
+
+  if (reduceMotion) {
+    b.classList.add("done");
+  } else {
+    b.classList.add("intro", "nt");
+    scrollTo(0, 0);
+    centerLogo();
+
+    addEventListener("resize", function () {
+      if (!b.classList.contains("jumped")) centerLogo();
+    });
+
+    tJump = setTimeout(function () {
+      b.classList.remove("nt");
+      void w.offsetWidth;
+      b.classList.add("jumped");
+      setTransform("0px", "0px", "1");
+    }, 320);
+
+    tCurtain = setTimeout(function () {
+      b.classList.add("curtain-up");
+    }, 680);
+
+    tDone = setTimeout(function () {
+      b.classList.add("done");
+    }, 1150);
+  }
+
+  // Indicador animado de deslizamiento: lleva suavemente a Ubicaciones al tocarlo
+  // y se desvanece una vez el usuario ya ha deslizado la pantalla.
+  var scrollHint = document.getElementById("scrollHint");
+  if (scrollHint) {
+    scrollHint.addEventListener("click", function () {
+      finishIntroImmediately();
+      var target = document.getElementById("ubicacionesSection");
+      if (!target) return;
+      var header = document.getElementById("topHeader");
+      var offset = (header ? header.offsetHeight : 56) + 12;
+      var destY = Math.max(0, target.getBoundingClientRect().top + window.scrollY - offset);
+      window.scrollTo({
+        top: destY,
+        behavior: reduceMotion ? "auto" : "smooth"
+      });
+    });
+
+    window.addEventListener("scroll", function () {
+      scrollHint.classList.toggle("is-scrolled", window.scrollY > 36);
+    }, { passive: true });
+  }
+
+  setTimeout(function () {
+    if (!window.__appOK) {
+      document.getElementById("statusText").textContent = "Sin conexión · revisa tu red";
+    }
+  }, 6000);
+
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(function (entries) {
+      document.getElementById("topBrand").classList.toggle("show", !entries[0].isIntersecting);
+    }, { rootMargin: "-48px 0px 0px 0px" }).observe(document.getElementById("brandTitle"));
+  }
+})();
+</script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { getDatabase, ref, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 
-// ---------- CONFIGURAMOA ESTO TMB ----------
+window.__appOK = true;
+
+// =========================================================================
+// CONFIGURACIÓN CENTRALIZADA (Firebase + Umbrales Ambientales Unificados)
+// =========================================================================
 const DATABASE_URL = "https://medio-ambiente-f3d50-default-rtdb.firebaseio.com/";
-// ------------------------------------
-
+const REST = DATABASE_URL.replace(/\/$/, "");
 const OFFLINE_AFTER_S = 90;
+const REFRESCAR_NODOS_MS = 30000;
+const HISTORIAL_FETCH_LIMIT = 3000;
 
+const TEMP_SCALE = {
+  minDisplay: 10,
+  coldMax: 20,
+  okMax: 27,
+  warnMax: 30,
+  maxDisplay: 40
+};
+
+// priority define qué variable encabeza el resumen cuando varias tienen la misma severidad
 const METRICS = [
-  { key: "luz",         label: "Luz",         unit: "lux", color: "#D9960B", dec: 0 },
-  { key: "sonido",      label: "Sonido",      unit: "dB",  color: "#6F86E8", dec: 1 },
-  { key: "temperatura", label: "Temperatura", unit: "°C",  color: "#E0583F", dec: 1 },
-  { key: "humedad",     label: "Humedad",     unit: "%",   color: "#28A3B3", dec: 0 },
+  {
+    key: "temperatura", label: "Temperatura", tab: "Temperatura", articleName: "una temperatura",
+    unit: "°C", color: "#E85D3F", dec: 1, computed: false, priority: 5,
+    icon: `<path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0Z"/><circle cx="11.5" cy="17.5" r="1.5" fill="currentColor"/>`,
+    levels: [
+      [16, "Frío", "info", "Temperatura baja (frío)"],
+      [TEMP_SCALE.coldMax, "Fresco", "info", "Temperatura baja (fresco)"],
+      [TEMP_SCALE.okMax, "Agradable", "ok", "Temperatura adecuada"],
+      [TEMP_SCALE.warnMax, "Cálido", "warn", "Temperatura elevada (cálido)"],
+      [33, "Calor", "bad", "Temperatura excesiva (calor)"],
+      [Infinity, "Mucho calor", "bad", "Temperatura excesiva (mucho calor)"]
+    ]
+  },
+  {
+    key: "sensacion", label: "Sensación térmica", tab: "Sensación", articleName: "una sensación térmica",
+    unit: "°C", color: "#D97706", dec: 1, computed: true, priority: 4,
+    icon: `<path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2"/><circle cx="12" cy="12" r="4"/>`,
+    levels: [
+      [16, "Se siente frío", "info", "Sensación térmica fría"],
+      [20, "Se siente fresco", "info", "Sensación térmica fresca"],
+      [28, "Se siente bien", "ok", "Sensación térmica cómoda"],
+      [31, "Se siente cálido", "warn", "Sensación térmica cálida"],
+      [35, "Se siente calor", "bad", "Sensación térmica de calor"],
+      [Infinity, "Bochorno", "bad", "Sensación térmica de bochorno"]
+    ]
+  },
+  {
+    key: "sonido", label: "Ruido", tab: "Ruido", articleName: "un ruido",
+    unit: "dB", color: "#008B7D", dec: 1, computed: false, priority: 3,
+    icon: `<path d="M4 10v4"/><path d="M8 7v10"/><path d="M12 4v16"/><path d="M16 8v8"/><path d="M20 11v2"/>`,
+    levels: [
+      [35, "Muy silencioso", "ok", "Ambiente muy silencioso"],
+      [50, "Tranquilo", "ok", "Nivel de ruido adecuado"],
+      [65, "Algo de ruido", "warn", "Nivel de ruido moderado"],
+      [80, "Ruidoso", "bad", "Nivel de ruido alto"],
+      [Infinity, "Muy ruidoso", "bad", "Nivel de ruido muy alto"]
+    ]
+  },
+  {
+    key: "luz", label: "Iluminación", tab: "Iluminación", articleName: "una iluminación",
+    unit: "lux", color: "#C68A00", dec: 0, computed: false, priority: 2,
+    icon: `<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>`,
+    levels: [
+      [20, "Muy oscuro", "bad", "Iluminación muy baja (oscuro)"],
+      [100, "Poca luz", "warn", "Poca iluminación para estudiar"],
+      [300, "Luz tenue", "info", "Iluminación tenue"],
+      [2000, "Buena luz", "ok", "Iluminación adecuada"],
+      [10000, "Mucha luz", "warn", "Iluminación muy intensa"],
+      [Infinity, "Luz muy intensa", "warn", "Iluminación excesiva"]
+    ]
+  },
+  {
+    key: "humedad", label: "Humedad", tab: "Humedad", articleName: "una humedad",
+    unit: "%", color: "#0088CC", dec: 0, computed: false, priority: 1,
+    icon: `<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/><path d="M9.5 14.5a3.5 3.5 0 0 0 4.5 1.5" opacity=".7"/>`,
+    levels: [
+      [30, "Muy seco", "warn", "Ambiente muy seco"],
+      [40, "Seco", "info", "Humedad algo baja"],
+      [61, "Cómoda", "ok", "Humedad adecuada"],
+      [71, "Algo húmedo", "warn", "Humedad elevada"],
+      [Infinity, "Muy húmedo", "bad", "Humedad excesiva"]
+    ]
+  }
 ];
 
-const grid = document.getElementById("grid");
-METRICS.forEach(m => {
-  const el = document.createElement("article");
-  el.className = "panel";
-  el.innerHTML = `
-    <h2>${m.label}</h2>
-    <div class="value" id="v-${m.key}">--<small>${m.unit}</small></div>
-    <p class="minmax" id="mm-${m.key}"></p>
-    <div class="chart"><canvas id="c-${m.key}" aria-label="Gráfica de ${m.label}" role="img"></canvas></div>`;
-  grid.appendChild(el);
-});
+const MENSAJES_OPTIMOS_GENERAL = [
+  {
+    titulo: "Ambiente adecuado para permanecer o estudiar",
+    subtitulo: "Todas las variables medidas se mantienen dentro de rangos confortables."
+  },
+  {
+    titulo: "Condiciones óptimas de confort ambiental",
+    subtitulo: "Temperatura agradable, buena iluminación y nivel acústico estable en esta zona."
+  },
+  {
+    titulo: "Espacio confortable y equilibrado en este momento",
+    subtitulo: "Los sensores reportan parámetros ideales para la concentración y el bienestar."
+  },
+  {
+    titulo: "Entorno favorable sin alertas activas",
+    subtitulo: "Temperatura, humedad, luz y sonido operan dentro de los valores recomendados."
+  }
+];
 
-const fmt = (v, d) => Number(v).toLocaleString("es-CO", { minimumFractionDigits: d, maximumFractionDigits: d });
+const MENSAJES_OPTIMOS_CAFETERIA = [
+  {
+    titulo: "Ambiente agradable para descansar o compartir",
+    subtitulo: "Temperatura, ventilación e iluminación confortables en la zona social."
+  },
+  {
+    titulo: "Condiciones óptimas en esta zona del campus",
+    subtitulo: "Todos los sensores activos registran niveles cómodos en este momento."
+  }
+];
+
+const MBY = Object.fromEntries(METRICS.map(m => [m.key, m]));
+const BENTO_KEYS = ["temperatura", "sensacion", "humedad", "luz", "sonido"];
+const SEVERITY_RANK = { bad: 3, warn: 2, info: 1, ok: 0 };
+
+const $ = id => document.getElementById(id);
+
+// Acepta tanto números JSON como cadenas numéricas ("26.5") enviadas por microcontroladores
+function toNum(v) {
+  if (typeof v === "number") return Number.isFinite(v) ? v : null;
+  if (typeof v === "string" && v.trim() !== "") {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+  return null;
+}
+const num = v => toNum(v) !== null;
+const fmt = (v, d) => Number(toNum(v)).toLocaleString("es-CO", { minimumFractionDigits: d, maximumFractionDigits: d });
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const nivel = (m, v) => m.levels.find(l => toNum(v) < l[0]);
+const prefersReducedMotion = () => window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-// ---------- Gráficas ----------
-const charts = {};
-METRICS.forEach(m => {
-  charts[m.key] = new Chart(document.getElementById("c-" + m.key), {
-    type: "line",
-    data: { labels: [], datasets: [{
-      data: [], borderColor: m.color, backgroundColor: m.color + "26",
-      borderWidth: 2, tension: .3, pointRadius: 0, pointHoverRadius: 4, fill: true
-    }]},
-    options: {
-      responsive: true, maintainAspectRatio: false, animation: false,
-      interaction: { mode: "index", intersect: false },
-      plugins: { legend: { display: false },
-        tooltip: { callbacks: { label: c => `${fmt(c.parsed.y, m.dec)} ${m.unit}` } } },
-      scales: {
-        x: { grid: { display: false }, ticks: { maxTicksLimit: 5, maxRotation: 0 } },
-        y: { grace: "10%", ticks: { maxTicksLimit: 4 } }
-      }
-    }
-  });
-});
-
-function themeCharts() {
-  Object.values(charts).forEach(c => {
-    c.options.scales.x.ticks.color = css("--muted");
-    c.options.scales.y.ticks.color = css("--muted");
-    c.options.scales.y.grid.color = css("--grid");
-    c.update();
+function scrollHorizontalToChild(container, child) {
+  if (!container || !child) return;
+  if (container.scrollWidth <= container.clientWidth) return;
+  const targetLeft = child.offsetLeft - (container.clientWidth / 2) + (child.offsetWidth / 2);
+  container.scrollTo({
+    left: Math.max(0, targetLeft),
+    behavior: prefersReducedMotion() ? "auto" : "smooth"
   });
 }
-themeCharts();
-window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", themeCharts);
 
-// ---------- Firebase ----------
+function scrollSmoothToSection(el) {
+  if (!el) return;
+  const header = $("topHeader");
+  const offset = (header ? header.offsetHeight : 56) + 12;
+  const destY = Math.max(0, el.getBoundingClientRect().top + window.scrollY - offset);
+  window.scrollTo({
+    top: destY,
+    behavior: prefersReducedMotion() ? "auto" : "smooth"
+  });
+}
+
+const TONE_ICONS = {
+  ok: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+  warn: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+  bad: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
+  info: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`
+};
+
+const VIZ_ICONS = {
+  noise: `<div class="eq"><span></span><span></span><span></span><span></span><span></span></div>`,
+  heat: `<svg class="viz-svg" viewBox="0 0 24 24"><path d="M12 2c.5 3.5-2 5.5-2 8.5a4 4 0 0 0 8 0c0-2.5-1.5-4.5-2-6.5-.5 1.5-1.5 2-2.5 2 .5-1.5 0-3-1.5-4Z"/><path d="M8.5 14.5A4.5 4.5 0 0 0 12 21a4.5 4.5 0 0 0 3.5-6.5"/></svg>`,
+  cold: `<svg class="viz-svg" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/><circle cx="12" cy="12" r="3"/></svg>`,
+  dark: `<svg class="viz-svg" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`,
+  humid: `<svg class="viz-svg" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`,
+  ok: `<svg class="viz-svg" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`
+};
+
+const sensacion = (t, h) => t + 0.33 * ((h / 100) * 6.105 * Math.exp(17.27 * t / (237.7 + t))) - 4.0;
+
+// Normaliza claves, timestamps (segundos o ms) y rangos físicos válidos para cualquier ESP32
+function enriquecer(d) {
+  if (!d || typeof d !== "object") return {};
+  const r = { ...d };
+
+  const rawTs = toNum(r.ts);
+  if (rawTs !== null) {
+    r.ts = rawTs > 1e12 ? Math.floor(rawTs / 1000) : rawTs;
+  }
+
+  const t = toNum(r.temperatura);
+  r.temperatura = (t !== null && t >= -10 && t <= 60) ? t : null;
+
+  const h = toNum(r.humedad);
+  r.humedad = (h !== null && h >= 0 && h <= 100) ? h : null;
+
+  const rawLuz = toNum(r.luz !== undefined ? r.luz : r.iluminacion);
+  r.luz = (rawLuz !== null && rawLuz >= 0 && rawLuz <= 200000) ? rawLuz : null;
+
+  const rawSonido = toNum(r.sonido !== undefined ? r.sonido : r.ruido);
+  r.sonido = (rawSonido !== null && rawSonido >= 0 && rawSonido <= 160) ? rawSonido : null;
+
+  if (r.temperatura !== null && r.humedad !== null) {
+    r.sensacion = Math.round(sensacion(r.temperatura, r.humedad) * 10) / 10;
+  } else {
+    r.sensacion = null;
+  }
+
+  return r;
+}
+
+// ---------- Ilustraciones isométricas de ubicaciones ----------
+function edificio() {
+  const P = (face, u, v) => face ? [28 + 32 * u, 38 + 16 * u + 46 * v] : [60 + 32 * u, 54 - 16 * u + 46 * v];
+  let w = "";
+  for (const face of [1, 0]) for (let r = 0; r < 4; r++) for (let c = 0; c < 3; c++) {
+    const u0 = 0.1 + 0.28 * c, u1 = u0 + 0.2, v0 = 0.1 + 0.22 * r, v1 = v0 + 0.14;
+    const pts = [P(face, u0, v0), P(face, u1, v0), P(face, u1, v1), P(face, u0, v1)].map(p => p.join(",")).join(" ");
+    w += `<polygon points="${pts}" fill="#fff" opacity="${(r + c + face) % 3 ? 0.6 : 0.92}"/>`;
+  }
+  return `<svg viewBox="0 0 120 120" aria-hidden="true"><defs>
+    <linearGradient id="bL" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0088CC"/><stop offset="1" stop-color="#003B66"/></linearGradient>
+    <linearGradient id="bR" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5CEAD2"/><stop offset="1" stop-color="#009FE3"/></linearGradient>
+    <linearGradient id="bT" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#CBEFF7"/></linearGradient>
+    <filter id="bB"><feGaussianBlur stdDeviation="3"/></filter></defs>
+    <ellipse cx="60" cy="104" rx="42" ry="9" fill="rgba(0,43,73,.22)" filter="url(#bB)"/>
+    <polygon points="28,38 60,54 60,100 28,84" fill="url(#bL)"/><polygon points="60,54 92,38 92,84 60,100" fill="url(#bR)"/>
+    <polygon points="60,22 92,38 60,54 28,38" fill="url(#bT)"/>${w}
+    <polygon points="48,26 60,32 60,42 48,36" fill="url(#bL)"/><polygon points="60,32 72,26 72,36 60,42" fill="url(#bR)"/><polygon points="60,20 72,26 60,32 48,26" fill="url(#bT)"/>
+    <polyline points="28,38 60,54 92,38" fill="none" stroke="#fff" stroke-opacity=".85" stroke-width="1.2" stroke-linejoin="round"/></svg>`;
+}
+
+const taza = () => `<svg viewBox="0 0 120 120" aria-hidden="true"><defs>
+    <linearGradient id="cB" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#E2EEF4"/><stop offset=".45" stop-color="#FFFFFF"/><stop offset="1" stop-color="#C7DCE6"/></linearGradient>
+    <linearGradient id="cS" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#B8D4E0"/></linearGradient>
+    <radialGradient id="cC" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#9A6A45"/><stop offset="1" stop-color="#4E3220"/></radialGradient>
+    <filter id="cF"><feGaussianBlur stdDeviation="3"/></filter></defs>
+    <ellipse cx="60" cy="100" rx="42" ry="9" fill="rgba(0,43,73,.22)" filter="url(#cF)"/>
+    <ellipse cx="60" cy="92" rx="40" ry="12" fill="url(#cS)"/><ellipse cx="60" cy="90" rx="30" ry="8" fill="#fff" opacity=".75"/>
+    <path d="M82 58c14-3 14 18-2 20" fill="none" stroke="url(#cB)" stroke-width="6" stroke-linecap="round"/>
+    <path d="M34 52h52c0 20-8 38-26 38S34 72 34 52Z" fill="url(#cB)"/>
+    <ellipse cx="60" cy="52" rx="26" ry="8" fill="#fff"/><ellipse cx="60" cy="53" rx="21" ry="6" fill="url(#cC)"/>
+    <ellipse cx="54" cy="51" rx="9" ry="1.8" fill="#fff" opacity=".35"/><path d="M40 60c1 12 6 22 14 26" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+    <g fill="none" stroke="#00A896" stroke-opacity=".6" stroke-width="3" stroke-linecap="round"><path class="steam" d="M50 40c-5-6 5-9 0-16"/><path class="steam" d="M60 38c-5-6 5-9 0-16"/><path class="steam" d="M70 40c-5-6 5-9 0-16"/></g></svg>`;
+
+const arte = id => /cafe/i.test(id) ? taza() : edificio();
+const subUbicacion = id => /cafe/i.test(id) ? "Zona social y descanso" : /bloque|block/i.test(id) ? "Aulas y estudio" : "Espacio del campus";
+
+// ---------- Estado global ----------
+let nodo = null;
+let rango = 60;
+let metric = "temperatura";
+let cur = null;
+let allFetchedRows = [];
+let rows = [];
+let lastTs = null;
+let histError = false;
+let unsubActual = null;
+let unsubHist = null;
+let isLoadingNodes = false;
+const live = {};
+const watchers = {};
+const cards = {};
+
+(function initGaugeProportions() {
+  const { minDisplay, coldMax, okMax, warnMax, maxDisplay } = TEMP_SCALE;
+  const wCold = coldMax - minDisplay;
+  const wOk = okMax - coldMax;
+  const wWarn = warnMax - okMax;
+  const wBad = maxDisplay - warnMax;
+  const gs = $("gaugeSegments");
+  if (gs) gs.style.gridTemplateColumns = `${wCold}fr ${wOk}fr ${wWarn}fr ${wBad}fr`;
+})();
+
+// ---------- Inicializar Tarjetas Bento (layout libre de superposiciones) ----------
+const bento = $("bento");
+BENTO_KEYS.forEach(key => {
+  const m = MBY[key];
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "tile";
+  b.id = "t-" + m.key;
+  b.hidden = true;
+  b.setAttribute("aria-pressed", "false");
+  b.style.setProperty("--c", m.color);
+  b.innerHTML = `
+    <div class="tile-head">
+      <div class="tile-top-row">
+        <span class="ic"><svg viewBox="0 0 24 24">${m.icon}</svg></span>
+        <span class="tile-chart-btn" id="hint-${m.key}">
+          <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <span class="btn-lbl" id="hintTxt-${m.key}">Historial</span>
+        </span>
+      </div>
+      <div class="th-labels">
+        <span class="th-name">${m.label}</span>
+        ${m.computed ? `<span class="th-tag">Calculada</span>` : ""}
+      </div>
+    </div>
+    <div class="tile-current">
+      <div class="val" id="v-${m.key}">--<small>${m.unit}</small></div>
+      <span class="badge" id="b-${m.key}"></span>
+    </div>
+    <div class="tile-mm" id="mm-${m.key}">
+      <span id="lo-${m.key}"></span>
+      <span id="hi-${m.key}"></span>
+    </div>`;
+  b.addEventListener("click", () => elegirMetrica(m.key, true));
+  bento.appendChild(b);
+});
+
+// ---------- Inicializar Pestañas del Historial ----------
+const tabs = $("tabs");
+METRICS.forEach(m => {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "tab";
+  b.id = "tab-" + m.key;
+  b.textContent = m.tab;
+  b.hidden = true;
+  b.setAttribute("aria-pressed", "false");
+  b.addEventListener("click", () => elegirMetrica(m.key, false));
+  tabs.appendChild(b);
+});
+
+// ---------- Inicializar Chart.js ----------
+const getMaxXTicks = () => (window.innerWidth <= 420 ? 4 : window.innerWidth <= 840 ? 6 : 8);
+
+const chart = window.Chart ? new Chart($("chart"), {
+  type: "line",
+  data: {
+    labels: [],
+    datasets: [{
+      data: [],
+      borderWidth: 2.4,
+      tension: 0.3,
+      pointRadius: ctx => (ctx.dataIndex === ctx.dataset.data.length - 1 ? 5.5 : 0),
+      pointBackgroundColor: ctx => (ctx.dataIndex === ctx.dataset.data.length - 1 ? "#FFFFFF" : MBY[metric].color),
+      pointBorderColor: () => MBY[metric].color,
+      pointBorderWidth: ctx => (ctx.dataIndex === ctx.dataset.data.length - 1 ? 2.8 : 0),
+      pointHoverRadius: 6.5,
+      pointHoverBorderWidth: 2.5,
+      pointHoverBorderColor: "#FFFFFF",
+      fill: true,
+      backgroundColor: ctx => {
+        const a = ctx.chart.chartArea;
+        if (!a) return "transparent";
+        const g = ctx.chart.ctx.createLinearGradient(0, a.top, 0, a.bottom);
+        g.addColorStop(0, MBY[metric].color + "4D");
+        g.addColorStop(1, MBY[metric].color + "00");
+        return g;
+      }
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: { duration: 400, easing: "easeOutQuart" },
+    interaction: { mode: "index", intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: "rgba(0, 32, 56, 0.94)",
+        titleColor: "#FFFFFF",
+        bodyColor: "#FFFFFF",
+        cornerRadius: 11,
+        padding: 10,
+        caretPadding: 8,
+        displayColors: false,
+        titleFont: { weight: "500", size: 11 },
+        bodyFont: { weight: "700", size: 14 },
+        callbacks: {
+          title: items => {
+            if (!items.length) return "";
+            const idx = items[0].dataIndex;
+            const total = items[0].dataset.data.length;
+            return items[0].label + (idx === total - 1 ? " · Más reciente" : "");
+          },
+          label: c => {
+            const m = MBY[metric];
+            const [, txt] = nivel(m, c.parsed.y);
+            const origen = m.computed ? " · estimada" : "";
+            return `${fmt(c.parsed.y, m.dec)} ${m.unit} (${txt}${origen})`;
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        border: { display: false },
+        ticks: { maxTicksLimit: getMaxXTicks(), maxRotation: 0, font: { size: 11 } }
+      },
+      y: {
+        grace: "12%",
+        border: { display: false },
+        ticks: { maxTicksLimit: 5, font: { size: 11 } }
+      }
+    }
+  }
+}) : null;
+
+function themeChart() {
+  if (!chart) return;
+  const muted = css("--muted");
+  chart.options.scales.x.ticks.color = muted;
+  chart.options.scales.x.ticks.maxTicksLimit = getMaxXTicks();
+  chart.options.scales.y.ticks.color = muted;
+  chart.options.scales.y.grid.color = css("--fill");
+  chart.update("none");
+}
+themeChart();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", themeChart);
+window.addEventListener("resize", () => {
+  if (!chart) return;
+  const nextTicks = getMaxXTicks();
+  if (chart.options.scales.x.ticks.maxTicksLimit !== nextTicks) {
+    chart.options.scales.x.ticks.maxTicksLimit = nextTicks;
+    chart.update("none");
+  }
+});
+
+// ---------- Inicializar Firebase ----------
 const app = initializeApp({ databaseURL: DATABASE_URL });
 const db = getDatabase(app);
 
-let lastTs = null;
-const statusEl = document.getElementById("status");
-const statusText = document.getElementById("statusText");
-const emptyEl = document.getElementById("empty");
-
-function ago(s) {
-  if (s < 60) return `${Math.max(0, Math.round(s))} s`;
-  if (s < 3600) return `${Math.round(s / 60)} min`;
-  return `${Math.round(s / 3600)} h`;
-}
+// ---------- Utilidades de tiempo ----------
+const ago = s => s < 60 ? `${Math.max(0, Math.round(s))} s` : s < 3600 ? `${Math.round(s / 60)} min` : `${Math.round(s / 3600)} h`;
+const formatClock = ts => new Date(ts * 1000).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+const formatShortTime = ts => new Date(ts * 1000).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" });
 
 function renderStatus() {
-  if (lastTs === null) return;
-  const s = Date.now() / 1000 - lastTs;
-  const online = s <= OFFLINE_AFTER_S;
-  statusEl.className = "status " + (online ? "on" : "off");
-  statusText.textContent = online ? `En línea, dato de hace ${ago(s)}` : `Sin señal, último dato hace ${ago(s)}`;
+  const pill = $("status");
+  if (lastTs !== null) {
+    const s = Date.now() / 1000 - lastTs;
+    const on = s <= OFFLINE_AFTER_S;
+    pill.className = "pill " + (on ? "on" : "off");
+    $("statusText").textContent = on ? `En línea · hace ${ago(s)}` : `Desactualizado · hace ${ago(s)}`;
+    $("hero").classList.toggle("stale", !on);
+    $("hTime").classList.toggle("is-offline", !on);
+    $("hTimeText").textContent = on
+      ? `Dato recibido ${formatClock(lastTs)} · hace ${ago(s)}`
+      : `Último dato ${formatClock(lastTs)} · hace ${ago(s)} · sensor sin conexión`;
+  }
+  Object.keys(cards).forEach(updateCard);
 }
 setInterval(renderStatus, 5000);
 
-onValue(ref(db, "medio_ambiente/actual"), snap => {
-  const d = snap.val();
-  if (!d) {
-    statusText.textContent = "Sin datos";
-    emptyEl.style.display = "block";
-    return;
-  }
-  emptyEl.style.display = "none";
-  lastTs = d.ts;
-  METRICS.forEach(m => {
-    if (d[m.key] === undefined) return;
-    document.getElementById("v-" + m.key).innerHTML = `${fmt(d[m.key], m.dec)}<small>${m.unit}</small>`;
-  });
-  renderStatus();
-}, err => {
-  statusEl.className = "status off";
-  statusText.textContent = "No se pudo leer Firebase: revisa las reglas y la URL";
-  console.error(err);
-});
+// ---------- Tarjetas de ubicación ----------
+function ensureCard(id) {
+  if (cards[id]) return cards[id];
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "loc";
+  b.setAttribute("aria-pressed", "false");
+  b.innerHTML = `
+    <div class="art">${arte(id)}</div>
+    <div class="loc-body">
+      <div class="loc-top">
+        <strong></strong>
+        <span class="active-tag">${TONE_ICONS.ok} Activa</span>
+      </div>
+      <span class="ls"></span>
+      <em class="live">
+        <span class="live-ic"></span>
+        <b></b>
+      </em>
+    </div>`;
+  b.addEventListener("click", () => seleccionar(id, true));
+  $("locs").appendChild(b);
+  return (cards[id] = b);
+}
 
-let unsubHist = null;
-function cargarHistorial(n) {
-  if (unsubHist) unsubHist();
-  unsubHist = onValue(query(ref(db, "medio_ambiente/historial"), limitToLast(n)), snap => {
-    const rows = Object.values(snap.val() || {}).filter(r => r.ts).sort((a, b) => a.ts - b.ts);
-    const labels = rows.map(r => new Date(r.ts * 1000).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" }));
-    METRICS.forEach(m => {
-      const vals = rows.map(r => r[m.key]).filter(v => typeof v === "number");
-      const c = charts[m.key];
-      c.data.labels = labels;
-      c.data.datasets[0].data = rows.map(r => r[m.key]);
-      c.update();
-      document.getElementById("mm-" + m.key).textContent = vals.length
-        ? `Mín ${fmt(Math.min(...vals), m.dec)}   Máx ${fmt(Math.max(...vals), m.dec)}`
-        : "";
-    });
+function updateCard(id) {
+  const b = cards[id];
+  if (!b) return;
+  const d = live[id];
+  const hasData = Boolean(d && num(d.ts));
+  const s = hasData ? (Date.now() / 1000 - toNum(d.ts)) : null;
+  const on = hasData && s <= OFFLINE_AFTER_S;
+  const name = d?.nombre || id;
+
+  b.querySelector("strong").textContent = name;
+  b.querySelector(".ls").textContent = subUbicacion(id);
+
+  const liveEl = b.querySelector(".live");
+  const liveIc = b.querySelector(".live-ic");
+  const liveTxt = b.querySelector("b");
+
+  if (!d) {
+    liveEl.className = "live";
+    liveIc.innerHTML = TONE_ICONS.info;
+    liveTxt.textContent = "Conectando…";
+  } else if (on) {
+    liveEl.className = "live on";
+    liveIc.innerHTML = TONE_ICONS.ok;
+    liveTxt.textContent = num(d.temperatura) ? `En línea · ${fmt(d.temperatura, 1)} °C` : "En línea";
+  } else if (hasData) {
+    liveEl.className = "live stale-loc";
+    liveIc.innerHTML = TONE_ICONS.warn;
+    liveTxt.textContent = `Hace ${ago(s)}`;
+  } else {
+    liveEl.className = "live off";
+    liveIc.innerHTML = TONE_ICONS.bad;
+    liveTxt.textContent = "Sin señal";
+  }
+
+  const isSelected = b.getAttribute("aria-pressed") === "true";
+  b.setAttribute("aria-label", `${name}${isSelected ? " (ubicación seleccionada)" : ""}, ${liveTxt.textContent}`);
+}
+
+function vigilar(id) {
+  ensureCard(id);
+  updateCard(id);
+  if (watchers[id]) return;
+  watchers[id] = onValue(ref(db, `medio_ambiente/nodos/${id}/actual`), snap => {
+    const val = snap.val();
+    live[id] = val ? enriquecer(val) : null;
+    updateCard(id);
+    if (id === nodo) {
+      $("hLoc").textContent = live[id]?.nombre || id;
+    }
   });
 }
-cargarHistorial(60);
 
-document.querySelectorAll(".range button").forEach(b => {
+// ---------- Escala Térmica Proporcional (10 °C – 40 °C) ----------
+function computeTempGaugePos(t) {
+  const { minDisplay, maxDisplay } = TEMP_SCALE;
+  const clamped = Math.max(minDisplay, Math.min(maxDisplay, t));
+  return ((clamped - minDisplay) / (maxDisplay - minDisplay)) * 100;
+}
+
+function renderTempGauge(t) {
+  const marker = $("gaugeMarker");
+  const statePill = $("hTempState");
+  const stateIcon = $("hTempStateIcon");
+  const stateText = $("hTempStateText");
+
+  ["seg-cold", "seg-ok", "seg-warn", "seg-bad"].forEach(id => $(id).classList.remove("is-current"));
+
+  if (!num(t)) {
+    marker.style.opacity = "0";
+    statePill.dataset.tone = "info";
+    stateIcon.innerHTML = TONE_ICONS.info;
+    stateText.textContent = "Sin lectura";
+    return;
+  }
+
+  const val = toNum(t);
+  const [, badgeTxt, tone] = nivel(MBY.temperatura, val);
+  const pos = Math.min(97.5, Math.max(2.5, computeTempGaugePos(val)));
+  marker.style.opacity = "1";
+  marker.style.setProperty("--pos", pos.toFixed(2) + "%");
+
+  const activeSegId = val < TEMP_SCALE.coldMax ? "seg-cold"
+    : val < TEMP_SCALE.okMax ? "seg-ok"
+    : val < TEMP_SCALE.warnMax ? "seg-warn"
+    : "seg-bad";
+  $(activeSegId).classList.add("is-current");
+
+  const zonePrefix = val < TEMP_SCALE.coldMax ? "Baja"
+    : val < TEMP_SCALE.okMax ? "Adecuada"
+    : val < TEMP_SCALE.warnMax ? "Elevada"
+    : "Excesiva";
+
+  statePill.dataset.tone = tone;
+  stateIcon.innerHTML = TONE_ICONS[tone];
+  stateText.textContent = `${zonePrefix} · ${badgeTxt}`;
+  $("tempGauge").setAttribute("aria-label", `Indicador proporcional de temperatura: ${fmt(val, 1)} °C, zona ${zonePrefix.toLowerCase()} (${badgeTxt.toLowerCase()})`);
+}
+
+// ---------- Evaluación Ejecutiva, Prioridad y Resumen de Anomalías ----------
+function evaluarCondiciones(d) {
+  const hallazgos = [];
+  const evalKeys = ["temperatura", "sensacion", "sonido", "luz", "humedad"];
+
+  evalKeys.forEach(key => {
+    if (!num(d[key])) return;
+    const val = toNum(d[key]);
+    const m = MBY[key];
+    const [, badgeTxt, tone, fullDesc] = nivel(m, val);
+    if (tone !== "ok") {
+      const vizType = key === "sonido" ? "noise"
+        : (key === "temperatura" || key === "sensacion") ? (val < TEMP_SCALE.coldMax ? "cold" : "heat")
+        : key === "luz" ? "dark"
+        : "humid";
+
+      hallazgos.push({
+        key,
+        label: m.label,
+        articleName: m.articleName,
+        badgeTxt,
+        tone,
+        fullDesc,
+        computed: m.computed,
+        severity: SEVERITY_RANK[tone] || 1,
+        priority: m.priority || 0,
+        vizType,
+        valueStr: `${fmt(val, m.dec)} ${m.unit}`
+      });
+    }
+  });
+
+  // Ordena primero por gravedad (bad > warn > info) y luego por prioridad ambiental
+  hallazgos.sort((a, b) => (b.severity - a.severity) || (b.priority - a.priority));
+  return hallazgos;
+}
+
+function construirTextoAnomaliasSecundarias(hallazgos) {
+  const cantidad = hallazgos.length;
+  const unidad = cantidad === 1 ? "medición" : "mediciones";
+  return `${cantidad} ${unidad} por revisar. Selecciona una para ver su historial.`;
+}
+
+function titularHallazgo(item) {
+  const frase = item.fullDesc
+    .replace(/^Nivel de /i, "")
+    .replace(/\s*\([^)]*\)/g, "")
+    .trim();
+  return frase.charAt(0).toUpperCase() + frase.slice(1);
+}
+
+function renderHero() {
+  const d = cur;
+  if (!d) return;
+
+  $("hRetry").hidden = true;
+  const hallazgos = evaluarCondiciones(d);
+  $("hSub").hidden = false;
+  ["hViz", "hTitle"].forEach(id => {
+    $(id).disabled = true;
+    delete $(id).dataset.metric;
+  });
+  const worstTone = hallazgos.length ? hallazgos[0].tone : "ok";
+  const vizKey = hallazgos.length ? hallazgos[0].vizType : "ok";
+
+  document.body.dataset.tone = worstTone;
+  $("hViz").innerHTML = VIZ_ICONS[vizKey] || VIZ_ICONS.ok;
+
+  const genPill = $("hGeneralPill");
+  genPill.dataset.level = worstTone;
+  $("hGeneralIcon").innerHTML = TONE_ICONS[worstTone];
+
+  if (worstTone === "bad") {
+    $("hGeneralLabel").textContent = "Mediciones por revisar";
+  } else if (worstTone === "warn" || worstTone === "info") {
+    $("hGeneralLabel").textContent = "Atención";
+  } else {
+    $("hGeneralLabel").textContent = "Condiciones adecuadas";
+  }
+
+  const oorWrap = $("hOorWrap");
+  const alertsList = $("hAlertsList");
+
+  if (!hallazgos.length) {
+    const pool = /cafe/i.test(nodo || "")
+      ? [...MENSAJES_OPTIMOS_CAFETERIA, ...MENSAJES_OPTIMOS_GENERAL]
+      : MENSAJES_OPTIMOS_GENERAL;
+    const idx = Math.floor(Date.now() / 60000) % pool.length;
+    $("hTitle").textContent = pool[idx].titulo;
+    $("hSub").textContent = pool[idx].subtitulo;
+    oorWrap.hidden = true;
+    alertsList.innerHTML = "";
+  } else {
+    const top = hallazgos[0];
+    $("hTitle").textContent = titularHallazgo(top);
+    $("hSub").textContent = construirTextoAnomaliasSecundarias(hallazgos);
+    $("hSub").hidden = false;
+
+    ["hViz", "hTitle"].forEach(id => {
+      $(id).dataset.metric = top.key;
+      $(id).disabled = false;
+      $(id).setAttribute("aria-label", `Ver historial de ${top.label}: ${top.badgeTxt}`);
+    });
+
+    oorWrap.hidden = hallazgos.length === 0;
+    alertsList.innerHTML = "";
+    hallazgos.forEach(item => {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "oor-chip";
+      chip.dataset.tone = item.tone;
+      chip.title = `Ver historial de ${item.label}`;
+      chip.setAttribute("aria-label", `${item.label}: ${item.badgeTxt}, valor actual ${item.valueStr}. Ver historial`);
+      chip.innerHTML = `
+        <span class="oor-main">
+          ${TONE_ICONS[item.tone]}
+          <span class="oor-name">${item.label}</span>
+          <span class="oor-state">· ${item.badgeTxt}</span>
+        </span>
+        <span class="oor-val">${item.valueStr}</span>`;
+      chip.addEventListener("click", () => elegirMetrica(item.key, true));
+      alertsList.appendChild(chip);
+    });
+  }
+
+  $("hTemp").innerHTML = num(d.temperatura) ? `${fmt(d.temperatura, 1)}<small>°C</small>` : `--<small>°C</small>`;
+
+  const feelEl = $("hFeel");
+  if (num(d.sensacion) && num(d.temperatura)) {
+    const diferencia = toNum(d.sensacion) - toNum(d.temperatura);
+    const [, sensTxt, sensTone] = nivel(MBY.sensacion, d.sensacion);
+    if (Math.abs(diferencia) < 1 && sensTone === "ok") {
+      feelEl.hidden = true;
+    } else {
+      const delta = fmt(Math.abs(diferencia), 1);
+      const comparacion = diferencia > 0 ? "más cálido" : "más fresco";
+      feelEl.hidden = false;
+      feelEl.textContent = `Sensación estimada: ${fmt(d.sensacion, 1)} °C · ${sensTxt} (${delta} °C ${comparacion} que el aire)`;
+    }
+  } else if (num(d.sensacion)) {
+    const [, sensTxt] = nivel(MBY.sensacion, d.sensacion);
+    feelEl.hidden = false;
+    feelEl.textContent = `Sensación estimada: ${fmt(d.sensacion, 1)} °C · ${sensTxt}`;
+  } else {
+    feelEl.hidden = true;
+  }
+  renderTempGauge(d.temperatura);
+}
+
+// ---------- Renderizado de Tarjetas de Mediciones ----------
+function renderTiles() {
+  BENTO_KEYS.forEach(key => {
+    const m = MBY[key];
+    const t = $("t-" + m.key);
+    const v = cur?.[m.key];
+    t.hidden = !num(v);
+    if (!num(v)) return;
+
+    const [, txt, tono] = nivel(m, v);
+    $("v-" + m.key).innerHTML = `${fmt(v, m.dec)}<small>${m.unit}</small>`;
+
+    const bd = $("b-" + m.key);
+    bd.className = "badge t-" + tono;
+    bd.innerHTML = `${TONE_ICONS[tono]}<span>${txt}</span>`;
+
+    const histVals = rows.map(r => toNum(r[m.key])).filter(x => x !== null);
+    const mmEl = $("mm-" + m.key);
+    if (histVals.length >= 2) {
+      const lo = Math.min(...histVals);
+      const hi = Math.max(...histVals);
+      mmEl.hidden = false;
+      $("lo-" + m.key).textContent = `Mín ${fmt(lo, m.dec)}${m.unit === "°C" ? "°" : " " + m.unit}`;
+      $("hi-" + m.key).textContent = `Máx ${fmt(hi, m.dec)}${m.unit === "°C" ? "°" : " " + m.unit}`;
+    } else {
+      mmEl.hidden = true;
+    }
+  });
+}
+
+function renderTabs() {
+  METRICS.forEach(m => {
+    $("tab-" + m.key).hidden = !num(cur?.[m.key]);
+  });
+  if (cur && !num(cur[metric])) {
+    const fallback = METRICS.find(m => num(cur[m.key]));
+    if (fallback) metric = fallback.key;
+  }
+  METRICS.forEach(m => {
+    const active = m.key === metric;
+    const tabEl = $("tab-" + m.key);
+    tabEl.setAttribute("aria-pressed", String(active));
+    if (active && !tabEl.hidden) {
+      scrollHorizontalToChild(tabs, tabEl);
+    }
+    const t = $("t-" + m.key);
+    if (t) {
+      t.setAttribute("aria-pressed", String(active));
+      const hintTxt = $("hintTxt-" + m.key);
+      if (hintTxt) hintTxt.textContent = active ? "En gráfica" : "Historial";
+    }
+  });
+}
+
+// ---------- Filtrado Temporal y Gráfica ----------
+function filtrarRowsPorTiempo() {
+  const nowSec = Math.floor(Date.now() / 1000);
+  const cutoffSec = nowSec - (rango * 60) - 60;
+  rows = allFetchedRows.filter(r => r.ts >= cutoffSec);
+}
+
+function renderChart() {
+  const m = MBY[metric];
+  const periodName = rango === 60 ? "Última hora" : rango === 360 ? "Últimas 6 horas" : "Últimas 24 horas";
+  $("dTitle").textContent = `${m.label}${m.computed ? " estimada" : ""} (${m.unit})`;
+
+  const validPoints = rows.filter(r => num(r[metric]));
+  if (validPoints.length > 0) {
+    let sum = 0;
+    let minPt = validPoints[0];
+    let maxPt = validPoints[0];
+    validPoints.forEach(pt => {
+      const v = toNum(pt[metric]);
+      sum += v;
+      if (v < toNum(minPt[metric])) minPt = pt;
+      if (v > toNum(maxPt[metric])) maxPt = pt;
+    });
+    const avg = sum / validPoints.length;
+    $("stAvg").textContent = `${fmt(avg, m.dec)} ${m.unit}`;
+    $("stAvgSub").textContent = `${validPoints.length} ${validPoints.length === 1 ? "registro" : "registros"}`;
+    $("stMin").textContent = `${fmt(minPt[metric], m.dec)} ${m.unit}`;
+    $("stMinSub").textContent = `a las ${formatShortTime(minPt.ts)}`;
+    $("stMax").textContent = `${fmt(maxPt[metric], m.dec)} ${m.unit}`;
+    $("stMaxSub").textContent = `a las ${formatShortTime(maxPt.ts)}`;
+
+    const firstTime = formatShortTime(validPoints[0].ts);
+    const lastTime = formatShortTime(validPoints[validPoints.length - 1].ts);
+    const cappedNote = (rango === 1440 && allFetchedRows.length >= HISTORIAL_FETCH_LIMIT)
+      ? " · límite de buffer alcanzado"
+      : "";
+    $("dMeta").textContent = `${periodName} · ${validPoints.length} ${validPoints.length === 1 ? "dato" : "datos"} (${firstTime} – ${lastTime})${cappedNote}`;
+  } else {
+    $("stAvg").textContent = "—";
+    $("stAvgSub").textContent = "Sin datos";
+    $("stMin").textContent = "—";
+    $("stMinSub").textContent = "—";
+    $("stMax").textContent = "—";
+    $("stMaxSub").textContent = "—";
+    $("dMeta").textContent = `${periodName} · sin registros`;
+  }
+
+  if (!chart) {
+    $("none").style.display = "flex";
+    $("noneText").textContent = "No se pudo inicializar la gráfica.";
+    return;
+  }
+
+  const spansMultipleDays = validPoints.length > 1 &&
+    new Date(validPoints[0].ts * 1000).toDateString() !== new Date(validPoints[validPoints.length - 1].ts * 1000).toDateString();
+
+  chart.data.labels = validPoints.map(r => {
+    const dt = new Date(r.ts * 1000);
+    return spansMultipleDays
+      ? dt.toLocaleString("es-CO", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })
+      : dt.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" });
+  });
+
+  const ds = chart.data.datasets[0];
+  ds.data = validPoints.map(r => toNum(r[metric]));
+  ds.borderColor = m.color;
+  ds.pointHoverBackgroundColor = m.color;
+  chart.update();
+
+  if (histError) {
+    $("none").style.display = "flex";
+    $("noneText").textContent = "No se pudo cargar el historial desde Firebase.";
+  } else if (!validPoints.length) {
+    $("none").style.display = "flex";
+    $("noneText").textContent = `No hay registros de ${m.label.toLowerCase()} en ${periodName.toLowerCase()}.`;
+  } else {
+    $("none").style.display = "none";
+  }
+}
+
+function elegirMetrica(k, shouldScroll = false) {
+  metric = k;
+  renderTabs();
+  renderChart();
+  if (shouldScroll) {
+    requestAnimationFrame(() => scrollSmoothToSection($("historialSection")));
+  }
+}
+
+function verHistorialPrincipal(event) {
+  const key = event.currentTarget.dataset.metric;
+  if (key && MBY[key]) elegirMetrica(key, true);
+}
+
+$("hViz").addEventListener("click", verHistorialPrincipal);
+$("hTitle").addEventListener("click", verHistorialPrincipal);
+
+// ---------- Suscripciones Firebase ----------
+function resetUI() {
+  cur = null;
+  allFetchedRows = [];
+  rows = [];
+  lastTs = null;
+  histError = false;
+
+  $("status").className = "pill";
+  $("statusText").textContent = "Conectando…";
+  $("hTime").classList.remove("is-offline");
+  $("hTimeText").textContent = "Esperando lectura…";
+  $("hGeneralPill").dataset.level = "info";
+  $("hGeneralIcon").innerHTML = TONE_ICONS.info;
+  $("hGeneralLabel").textContent = "Consultando ubicación";
+  $("hViz").innerHTML = VIZ_ICONS.ok;
+  ["hViz", "hTitle"].forEach(id => {
+    $(id).disabled = true;
+    delete $(id).dataset.metric;
+  });
+  $("hTitle").textContent = "Leyendo el ambiente…";
+  $("hSub").textContent = "Obteniendo mediciones en tiempo real de esta ubicación.";
+  $("hSub").hidden = false;
+  $("hOorWrap").hidden = true;
+  $("hAlertsList").innerHTML = "";
+  $("hRetry").hidden = true;
+  $("hTemp").innerHTML = `--<small>°C</small>`;
+  $("hFeel").hidden = true;
+  renderTempGauge(null);
+
+  $("hero").classList.remove("stale");
+  BENTO_KEYS.forEach(k => { $("t-" + k).hidden = true; });
+  renderTabs();
+  renderChart();
+}
+
+function suscribirActual() {
+  if (unsubActual) {
+    unsubActual();
+    unsubActual = null;
+  }
+  if (!nodo) return;
+
+  unsubActual = onValue(ref(db, `medio_ambiente/nodos/${nodo}/actual`), snap => {
+    const raw = snap.val();
+    if (!raw) {
+      $("status").className = "pill off";
+      $("statusText").textContent = "Sin datos";
+      $("hGeneralPill").dataset.level = "warn";
+      $("hGeneralIcon").innerHTML = TONE_ICONS.warn;
+      $("hGeneralLabel").textContent = "Sin lecturas disponibles";
+      $("hTitle").textContent = "Aún no hay datos en esta ubicación";
+      $("hSub").textContent = "Cuando el sensor envíe su primera lectura, aparecerá aquí automáticamente.";
+      $("hOorWrap").hidden = true;
+      return;
+    }
+    cur = enriquecer(raw);
+    lastTs = num(cur.ts) ? toNum(cur.ts) : null;
+    renderHero();
+    renderTiles();
+    renderTabs();
+    renderChart();
+    renderStatus();
+  }, err => {
+    $("status").className = "pill off";
+    $("statusText").textContent = "Error de conexión";
+    $("hGeneralPill").dataset.level = "bad";
+    $("hGeneralIcon").innerHTML = TONE_ICONS.bad;
+    $("hGeneralLabel").textContent = "Error de lectura";
+    $("hTitle").textContent = "No se pudieron recibir datos en tiempo real";
+    $("hSub").textContent = "Verifica tu conexión a internet e intenta nuevamente.";
+    $("hRetry").hidden = false;
+    console.error(err);
+  });
+}
+
+function suscribirHistorial() {
+  if (unsubHist) {
+    unsubHist();
+    unsubHist = null;
+  }
+  if (!nodo) return;
+
+  histError = false;
+  $("none").style.display = "flex";
+  $("noneText").textContent = "Reuniendo datos del historial…";
+
+  unsubHist = onValue(query(ref(db, `medio_ambiente/nodos/${nodo}/historial`), limitToLast(HISTORIAL_FETCH_LIMIT)), snap => {
+    histError = false;
+    allFetchedRows = Object.values(snap.val() || {})
+      .map(enriquecer)
+      .filter(r => r && num(r.ts))
+      .sort((a, b) => a.ts - b.ts);
+
+    filtrarRowsPorTiempo();
+    renderTiles();
+    renderChart();
+  }, err => {
+    histError = true;
+    console.error(err);
+    renderChart();
+  });
+}
+
+function seleccionar(id, userInitiated = false) {
+  nodo = id;
+  try { localStorage.setItem("nodoSeleccionado", id); } catch (e) {}
+
+  Object.entries(cards).forEach(([k, b]) => {
+    b.setAttribute("aria-pressed", String(k === id));
+    updateCard(k);
+  });
+
+  const activeCard = cards[id];
+  if (activeCard) {
+    scrollHorizontalToChild($("locs"), activeCard);
+  }
+
+  $("hLoc").textContent = live[id]?.nombre || id;
+  $("hLocSub").textContent = `· ${subUbicacion(id)}`;
+
+  resetUI();
+  suscribirActual();
+  suscribirHistorial();
+
+  if (userInitiated) {
+    requestAnimationFrame(() => {
+      const heroEl = $("hero");
+      const rect = heroEl.getBoundingClientRect();
+      if (rect.top < 56 || rect.top > window.innerHeight * 0.72) {
+        scrollSmoothToSection(heroEl);
+      }
+    });
+  }
+}
+
+async function cargarNodos() {
+  if (isLoadingNodes) return;
+  isLoadingNodes = true;
+  try {
+    const keys = await (await fetch(`${REST}/medio_ambiente/nodos.json?shallow=true`)).json();
+    const ids = Object.keys(keys || {}).sort();
+    const activeSet = new Set(ids);
+
+    Object.keys(watchers).forEach(oldId => {
+      if (!activeSet.has(oldId)) {
+        if (typeof watchers[oldId] === "function") watchers[oldId]();
+        delete watchers[oldId];
+        delete live[oldId];
+        if (cards[oldId]) {
+          cards[oldId].remove();
+          delete cards[oldId];
+        }
+      }
+    });
+
+    ids.forEach(vigilar);
+
+    if (!ids.length) {
+      if (unsubActual) { unsubActual(); unsubActual = null; }
+      if (unsubHist) { unsubHist(); unsubHist = null; }
+      nodo = null;
+      resetUI();
+      $("statusText").textContent = "Sin ubicaciones";
+      $("hTitle").textContent = "Aún no hay ubicaciones registradas";
+      $("hSub").textContent = "No se encontraron nodos activos en Firebase.";
+      return;
+    }
+
+    if (nodo && activeSet.has(nodo)) return;
+
+    let saved = null;
+    try { saved = localStorage.getItem("nodoSeleccionado"); } catch (e) {}
+    seleccionar(activeSet.has(saved) ? saved : ids[0], false);
+  } catch (e) {
+    $("status").className = "pill off";
+    $("statusText").textContent = "No se pudo conectar";
+    if (!nodo) {
+      $("hGeneralPill").dataset.level = "bad";
+      $("hGeneralIcon").innerHTML = TONE_ICONS.bad;
+      $("hGeneralLabel").textContent = "Sin conexión";
+      $("hTitle").textContent = "No se pudo conectar con los sensores";
+      $("hSub").textContent = "Comprueba tu acceso a internet para consultar las ubicaciones.";
+      $("hRetry").hidden = false;
+    }
+    console.error(e);
+  } finally {
+    isLoadingNodes = false;
+  }
+}
+
+$("hRetry").addEventListener("click", () => {
+  $("hRetry").hidden = true;
+  if (nodo) {
+    resetUI();
+    suscribirActual();
+    suscribirHistorial();
+  } else {
+    cargarNodos();
+  }
+});
+
+$("seg").querySelectorAll("button").forEach((b, i) => {
   b.addEventListener("click", () => {
-    document.querySelectorAll(".range button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
-    cargarHistorial(Number(b.dataset.n));
+    $("seg").querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    $("seg").style.setProperty("--i", i);
+    rango = Number(b.dataset.n);
+    filtrarRowsPorTiempo();
+    renderTiles();
+    renderChart();
   });
 });
+
+setInterval(() => {
+  if (allFetchedRows.length) {
+    filtrarRowsPorTiempo();
+    renderTiles();
+    renderChart();
+  }
+}, 30000);
+
+$("hViz").innerHTML = VIZ_ICONS.ok;
+renderTabs();
+cargarNodos();
+setInterval(cargarNodos, REFRESCAR_NODOS_MS);
 </script>
 </body>
 </html>

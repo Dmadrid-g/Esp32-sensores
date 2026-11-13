@@ -1,0 +1,31 @@
+# Credenciales locales para compilar el firmware.
+**/secrets.h
+secrets.h
+
+# Salidas generadas al compilar Arduino/ESP32
+build/
+build-*/
+.pio/
+*.elf
+*.bin
+*.hex
+*.map
+*.o
+*.d
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Archivos temporales y logs
+*.tmp
+*.bak
+*.log
+*.swp
+*.swo
+
+# Configuración local del editor
+.vscode/
+.idea/
+*.code-workspace
