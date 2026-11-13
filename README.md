@@ -24,7 +24,7 @@ Proyecto académico para medir y visualizar condiciones ambientales en distintos
 Esp32-sensores/
 ├── index.html                 # Dashboard web
 ├── images/                    # Logos usados por el dashboard
-├── docs/images/               # Capturas y fotografía del montaje
+├── docs/images/               # Capturas de la interfaz web
 └── IoT/
     ├── Bloque8/
     │   ├── Bloque8.ino
@@ -37,10 +37,6 @@ Esp32-sensores/
 Cada sketch está en una carpeta con el mismo nombre para abrirlo directamente en Arduino IDE. `secrets.h` se crea localmente a partir de la plantilla y está excluido de Git.
 
 ## Hardware y conexiones
-
-![Montaje físico del proyecto](docs/images/montaje.png)
-
-*Montaje de los sensores y el ESP32 utilizados en la estación.*
 
 ### Bloque 8
 
