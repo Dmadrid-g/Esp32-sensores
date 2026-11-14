@@ -1937,6 +1937,7 @@ const MENSAJES_OPTIMOS_CAFETERIA = [
 
 const MBY = Object.fromEntries(METRICS.map(m => [m.key, m]));
 const BENTO_KEYS = ["temperatura", "sensacion", "humedad", "luz", "sonido"];
+const HISTORY_ORDER = ["temperatura", "sensacion", "humedad", "luz", "sonido"];
 const SEVERITY_RANK = { bad: 3, warn: 2, info: 1, ok: 0 };
 
 const $ = id => document.getElementById(id);
@@ -2128,7 +2129,7 @@ BENTO_KEYS.forEach(key => {
 
 // ---------- Inicializar Pestañas del Historial ----------
 const tabs = $("tabs");
-METRICS.forEach(m => {
+HISTORY_ORDER.map(key => MBY[key]).filter(Boolean).forEach(m => {
   const b = document.createElement("button");
   b.type = "button";
   b.className = "tab";
