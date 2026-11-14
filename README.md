@@ -15,7 +15,7 @@ Proyecto académico para medir y visualizar condiciones ambientales en distintos
 ## Estado del proyecto
 
 - **Bloque 8:** nodo implementado con luz, sonido, temperatura y humedad.
-- **Cafetería:** sketch inicial en desarrollo; actualmente envía temperatura y humedad.
+- **Cafetería:** nodo implementado con luz, sonido, temperatura y humedad.
 - **Dashboard:** consulta los nodos de Firebase y presenta lecturas e historiales.
 
 ## Estructura
@@ -52,13 +52,15 @@ Cada sketch está en una carpeta con el mismo nombre para abrirlo directamente e
 | Componente | Conexión |
 |---|---|
 | ESP32 DevKit de 38 pines | Placa `ESP32 Dev Module` |
+| VEML7700 | I2C: SDA GPIO 21, SCL GPIO 22 |
+| INMP441 | I2S: SCK GPIO 18, WS GPIO 19, SD GPIO 23 |
 | DHT11 | DATA GPIO 4 |
 
 ## Tecnologías y librerías
 
 - **Firmware:** Arduino/C++ para ESP32, Wi-Fi y Firebase Realtime Database.
 - **Sensores de Bloque 8:** Adafruit VEML7700, DHT sensor library de Adafruit y Adafruit Unified Sensor; el micrófono INMP441 se lee por I2S.
-- **Sensores de Cafetería:** DHT sensor library de Adafruit y Adafruit Unified Sensor.
+- **Sensores de Cafetería:** VEML7700, INMP441 y DHT11; usa las mismas librerías de luz, audio y temperatura/humedad que Bloque 8.
 - **Conexión Firebase:** FirebaseClient de Mobizt.
 - **Dashboard:** HTML, CSS y JavaScript; Chart.js y el SDK web de Firebase se cargan desde CDN.
 
@@ -89,8 +91,14 @@ Luego abre `http://localhost:8000` en el navegador.
 Los sketches escriben en `medio_ambiente/nodos/{id}/actual` y agregan lecturas a `medio_ambiente/nodos/{id}/historial`.
 
 - **Bloque 8:** `nombre`, `luz`, `sonido`, `temperatura`, `humedad` y `ts`.
-- **Cafetería:** `nombre`, `temperatura`, `humedad` y `ts`.
-- Ambos sketches intentan actualizar la lectura actual cada **10 segundos** y guardar una entrada histórica cada tres envíos (aproximadamente **30 segundos**).
+- **Cafetería:** `nombre`, `luz`, `sonido`, `temperatura`, `humedad` y `ts`.
+- Ambos sketches actualizan la lectura actual cada **10 segundos** y guardan una entrada histórica cada seis envíos (aproximadamente **60 segundos**).
+
+## Ajustes de calibración
+
+Cada nodo tiene parámetros de ajuste propios en su sketch, porque usa componentes y montajes distintos. Cafetería aplica `TEMP_OFFSET = -1.7 °C`, `HUM_OFFSET = +15.5` puntos porcentuales, `LUZ_FACTOR = 0.88` y `DB_OFFSET = -19.5`. Bloque 8 aplica `TEMP_OFFSET = 0.0 °C`, `HUM_OFFSET = 0.0`, `LUZ_FACTOR = 1.0` y `DB_OFFSET = +14.5`.
+
+Estos valores son ajustes prácticos tomados para acercar las lecturas de ambos nodos a las referencias usadas en el proyecto y hacerlas más comparables. No representan una calibración metrológica certificada; en particular, el DHT11 tiene menor precisión que el DHT22 y los valores de sonido en dB son aproximados. Si se reemplaza un sensor, cambia su ubicación o se compara con una referencia distinta, hay que volver a validar los parámetros. El VEML7700 usa lectura automática (`VEML_LUX_AUTO`) en ambos nodos.
 
 ## Notas y seguridad
 

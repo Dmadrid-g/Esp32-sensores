@@ -1866,31 +1866,6 @@ const METRICS = [
     ]
   },
   {
-    key: "sonido", label: "Ruido", tab: "Ruido", articleName: "un ruido",
-    unit: "dB", color: "#008B7D", dec: 1, computed: false, priority: 3,
-    icon: `<path d="M4 10v4"/><path d="M8 7v10"/><path d="M12 4v16"/><path d="M16 8v8"/><path d="M20 11v2"/>`,
-    levels: [
-      [35, "Muy silencioso", "ok", "Ambiente muy silencioso"],
-      [50, "Tranquilo", "ok", "Nivel de ruido adecuado"],
-      [65, "Algo de ruido", "warn", "Nivel de ruido moderado"],
-      [80, "Ruidoso", "bad", "Nivel de ruido alto"],
-      [Infinity, "Muy ruidoso", "bad", "Nivel de ruido muy alto"]
-    ]
-  },
-  {
-    key: "luz", label: "Iluminación", tab: "Iluminación", articleName: "una iluminación",
-    unit: "lux", color: "#C68A00", dec: 0, computed: false, priority: 2,
-    icon: `<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>`,
-    levels: [
-      [20, "Muy oscuro", "bad", "Iluminación muy baja (oscuro)"],
-      [100, "Poca luz", "warn", "Poca iluminación para estudiar"],
-      [300, "Luz tenue", "info", "Iluminación tenue"],
-      [2000, "Buena luz", "ok", "Iluminación adecuada"],
-      [10000, "Mucha luz", "warn", "Iluminación muy intensa"],
-      [Infinity, "Luz muy intensa", "warn", "Iluminación excesiva"]
-    ]
-  },
-  {
     key: "humedad", label: "Humedad", tab: "Humedad", articleName: "una humedad",
     unit: "%", color: "#0088CC", dec: 0, computed: false, priority: 1,
     icon: `<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/><path d="M9.5 14.5a3.5 3.5 0 0 0 4.5 1.5" opacity=".7"/>`,
@@ -1900,6 +1875,32 @@ const METRICS = [
       [61, "Cómoda", "ok", "Humedad adecuada"],
       [71, "Algo húmedo", "warn", "Humedad elevada"],
       [Infinity, "Muy húmedo", "bad", "Humedad excesiva"]
+    ]
+  },
+  {
+    key: "luz", label: "Iluminación", tab: "Iluminación", articleName: "una iluminación",
+    unit: "lux", color: "#C68A00", dec: 0, computed: false, priority: 2,
+    icon: `<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>`,
+    levels: [
+      [20, "Muy baja", "bad", "Iluminación muy baja en el sensor"],
+      [100, "Baja", "warn", "Poca iluminación en el punto medido"],
+      [300, "Baja para estudiar", "warn", "Por debajo de la referencia básica de 300 lux para estudio"],
+      [500, "Referencia básica", "info", "Alcanza el rango básico de iluminación; más luz puede ayudar en tareas de lectura"],
+      [2000, "Adecuada para estudiar", "ok", "Iluminación adecuada para tareas de estudio"],
+      [10000, "Mucha luz", "warn", "Iluminación muy intensa"],
+      [Infinity, "Luz muy intensa", "warn", "Iluminación excesiva"]
+    ]
+  },
+  {
+    key: "sonido", label: "Ruido", tab: "Ruido", articleName: "un ruido",
+    unit: "dB", color: "#008B7D", dec: 1, computed: false, priority: 3,
+    icon: `<path d="M4 10v4"/><path d="M8 7v10"/><path d="M12 4v16"/><path d="M16 8v8"/><path d="M20 11v2"/>`,
+    levels: [
+      [35, "Muy silencioso", "ok", "Ambiente muy silencioso"],
+      [50, "Tranquilo", "ok", "Nivel de ruido adecuado"],
+      [65, "Algo de ruido", "warn", "Nivel de ruido moderado"],
+      [80, "Ruidoso", "bad", "Nivel de ruido alto"],
+      [Infinity, "Muy ruidoso", "bad", "Nivel de ruido muy alto"]
     ]
   }
 ];
