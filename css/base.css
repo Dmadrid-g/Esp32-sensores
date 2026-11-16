@@ -1,0 +1,99 @@
+:root {
+  /* Paleta Institucional I.U. Pascual Bravo — Tema Luminoso y Limpio */
+  --pb-navy: #002A3F;     /* Azul petróleo institucional (tinta principal y cifras) */
+  --pb-cyan: #00B2C1;     /* Turquesa institucional (acento principal / óptimo) */
+  --pb-lime: #C0CD29;     /* Verde lima institucional (naturaleza y frescura) */
+  --pb-yellow: #FFDC2F;   /* Amarillo institucional (sol y alertas luminosas) */
+
+  --bg: #E5EEEA;
+  --card: #F5F8F5;
+  --card-alt: #DCE8E3;
+  --ink: #002A3F;
+  --muted: #476273;
+  --line: rgba(0, 42, 63, 0.10);
+  --line-strong: rgba(0, 42, 63, 0.20);
+  --fill: rgba(0, 42, 63, 0.06);
+  --acc: #008C99;
+
+  /* Estados semánticos con alto contraste sobre fondo claro */
+  --ok: #007A85;
+  --ok-bg: rgba(0, 178, 193, 0.13);
+  --lime-ink: #4D5708;
+  --lime-bg: rgba(192, 205, 41, 0.20);
+  --warn: #945200;
+  --warn-bg: rgba(255, 220, 47, 0.28);
+  --bad: #B92B27;
+  --bad-bg: rgba(185, 43, 39, 0.12);
+  --info: #005F99;
+  --info-bg: rgba(0, 128, 204, 0.12);
+
+  /* Segmentos de escala térmica */
+  --seg-info: #0284C7;
+  --seg-ok: #00B2C1;
+  --seg-warn: #EAB308;
+  --seg-bad: #DC2626;
+  --tone: #00B2C1;
+
+  /* Logo institucional */
+  --logo-size: 100px;
+  --logo-radius: 22px;
+  --logo-pad: 4px;
+
+  --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --back-out: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --out: cubic-bezier(0.22, 1, 0.36, 1);
+  color-scheme: light;
+}
+
+body[data-tone="warn"] { --tone: #D97706; }
+body[data-tone="bad"]  { --tone: var(--bad); }
+body[data-tone="info"] { --tone: var(--info); }
+
+*, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html {
+  scroll-padding-top: 68px;
+  overflow-x: clip;
+}
+html.intro-lock,
+html.intro-lock body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 15px/1.48 var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  overflow-x: clip;
+  width: 100%;
+  transition: background-color 0.45s ease;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  text-align: inherit;
+}
+button:focus-visible,
+summary:focus-visible {
+  outline: 2.5px solid var(--pb-cyan);
+  outline-offset: 2px;
+}
+h1, h2, h3, p { margin: 0; }
+
+

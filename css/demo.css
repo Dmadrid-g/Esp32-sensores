@@ -1,0 +1,79 @@
+/* === INICIO MODO DEPURACIÓN (CSS) === */
+.debug-dock {
+  position: fixed;
+  right: 14px;
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  z-index: 90;
+  background: rgba(0, 42, 63, 0.94);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 14px;
+  padding: 9px 11px;
+  box-shadow: 0 10px 28px rgba(0, 26, 41, 0.28);
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  max-width: calc(100vw - 28px);
+}
+.debug-dock[hidden] { display: none; }
+.debug-dock.is-collapsed {
+  padding: 7px 11px;
+  border-radius: 999px;
+}
+.debug-dock.is-collapsed .debug-btns { display: none; }
+.debug-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.debug-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #FFDC2F;
+}
+.debug-toggle {
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.10);
+}
+.debug-toggle:hover { background: rgba(255, 255, 255, 0.18); }
+.debug-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.dbg-btn {
+  padding: 5px 9px;
+  border-radius: 8px;
+  font-size: 0.74rem;
+  font-weight: 650;
+  background: rgba(255, 255, 255, 0.10);
+  color: #F1F5F9;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  white-space: nowrap;
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
+}
+.dbg-btn:hover { background: rgba(255, 255, 255, 0.18); }
+.dbg-btn[aria-pressed="true"] {
+  background: #00B2C1;
+  border-color: #00B2C1;
+  color: #002A3F;
+  font-weight: 800;
+}
+.dbg-btn[data-preset="live"][aria-pressed="true"] {
+  background: #C0CD29;
+  border-color: #C0CD29;
+  color: #002A3F;
+}
+

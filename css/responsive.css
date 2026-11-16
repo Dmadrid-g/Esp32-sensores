@@ -1,0 +1,219 @@
+/* =========================================================
+   7. BREAKPOINTS FLUIDOS (320px – 1920px+)
+   ========================================================= */
+@media (max-width: 1120px) {
+  .bento {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 840px) {
+  .hero { padding: 18px 20px; }
+  .hero-main {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .chart { height: 245px; }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --logo-size: 76px;
+    --logo-radius: 18px;
+    --logo-pad: 3px;
+  }
+
+  html { scroll-padding-top: 58px; }
+
+  .top {
+    padding: calc(env(safe-area-inset-top, 0px) + 7px) 14px 7px;
+  }
+  .top h1 { font-size: 0.85rem; }
+  .pill { padding: 4px 9px; font-size: 0.71rem; gap: 6px; }
+
+  main {
+    padding: 12px 14px calc(76px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .brand { padding: 4px 0 6px; }
+  .logo-wrap { margin-bottom: 9px; }
+  .uni-badge { font-size: 0.66rem; margin-bottom: 2px; }
+  .scroll-hint { margin-top: 9px; font-size: 0.72rem; }
+
+  .sec-head { margin: 22px 0 9px; }
+  .sec-sub { font-size: 0.75rem; }
+
+  .locs {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 14px;
+    touch-action: pan-x pan-y;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 10px;
+    margin: 0 -14px;
+    padding: 2px 14px 6px;
+  }
+  .locs::-webkit-scrollbar { display: none; }
+  .loc {
+    flex: 0 0 auto;
+    width: clamp(220px, 70vw, 255px);
+    scroll-snap-align: start;
+    border-radius: 12px;
+    padding: 10px 12px;
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 10px;
+    min-height: 66px;
+  }
+  .art { width: 44px; height: 44px; border-radius: 10px; }
+  .art svg { width: 38px; height: 38px; }
+  .loc strong { font-size: 0.92rem; }
+  .ls { font-size: 0.72rem; }
+  .live { font-size: 0.7rem; margin-top: 2px; }
+
+  .hero {
+    margin-top: 12px;
+    border-radius: 14px;
+    padding: 15px 15px;
+    gap: 13px;
+  }
+  .hero-meta {
+    padding-bottom: 9px;
+    gap: 6px;
+  }
+  .hero-loc-name { font-size: 0.82rem; }
+  .hero-loc-sub { font-size: 0.74rem; }
+  .hero-time { font-size: 0.7rem; padding: 3px 8px; }
+
+  .hero-status-box { gap: 10px; }
+  .general-pill { font-size: 0.69rem; padding: 4px 9px; }
+  .verdict-row { gap: 10px; }
+  .status-viz { width: 36px; height: 36px; border-radius: 9px; }
+  .viz-svg { width: 18px; height: 18px; }
+  .hero .sub { font-size: 0.82rem; margin-top: 5px; }
+
+  .thermal-panel {
+    border-radius: 12px;
+    padding: 13px 14px;
+    gap: 9px;
+  }
+  .thermal-label { font-size: 0.68rem; }
+  .temp-state-pill { font-size: 0.71rem; padding: 3.5px 8px; }
+  .mascot-caption { font-size: 0.64rem; padding: 2px 7px; left: 8px; bottom: 6px; }
+  .feel { font-size: 0.77rem; }
+
+  .gauge-legend {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 3px 8px;
+    font-size: 0.67rem;
+  }
+
+  .bento {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+  .tile {
+    border-radius: 12px;
+    padding: 12px 12px;
+    gap: 8px;
+    min-height: 124px;
+  }
+  .tile-head { gap: 6px; }
+  .ic { width: 25px; height: 25px; border-radius: 6px; }
+  .ic svg { width: 14px; height: 14px; }
+  .th-name { font-size: 0.83rem; }
+  .th-tag { font-size: 0.62rem; }
+  .val { font-size: clamp(1.42rem, 5.5vw, 1.78rem); }
+  .badge { font-size: 0.69rem; padding: 2px 7px; }
+  .tile-mm { font-size: 0.66rem; padding-top: 6px; }
+
+  .detail {
+    border-radius: 14px;
+    padding: 15px 14px;
+  }
+  .dh {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .tabs {
+    margin: 0 -14px;
+    padding: 2px 14px 4px;
+  }
+  .tab {
+    padding: 6px 12px;
+    min-height: 36px;
+    font-size: 0.8rem;
+  }
+  .seg {
+    width: 100%;
+    min-width: 0;
+  }
+  .seg button {
+    min-height: 36px;
+    font-size: 0.8rem;
+  }
+  .chart-header { margin-bottom: 10px; }
+  .dt { font-size: 0.95rem; }
+  .d-meta { font-size: 0.72rem; }
+  .chart { height: 210px; }
+  .stat-box { padding: 8px 9px; }
+  .stat-label { font-size: 0.65rem; }
+  .stat-val { font-size: 0.9rem; }
+  .stat-sub { font-size: 0.64rem; }
+}
+
+@media (max-width: 480px) {
+  .oor-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .oor-chip {
+    width: 100%;
+    padding: 6px 9px;
+    font-size: 0.76rem;
+  }
+  .top-title-full { display: none; }
+  .top-title-short { display: inline; }
+}
+
+@media (max-width: 460px) {
+  .gauge-axis { font-size: 0.62rem; }
+  .gauge-axis .ax-mid1 { transform: translateX(-68%); }
+  .gauge-axis .ax-mid2 { transform: translateX(-32%); }
+}
+
+@media (max-width: 349px) {
+  :root {
+    --logo-size: 64px;
+    --logo-radius: 16px;
+    --logo-pad: 2px;
+  }
+  .top { padding-inline: 10px; }
+  .pill { padding: 4px 8px; font-size: 0.68rem; gap: 5px; }
+  main { padding-inline: 10px; }
+  .locs { margin: 0 -10px; padding-inline: 10px; }
+  .loc { width: 212px; }
+  .hero { padding: 13px 12px; }
+  .thermal-panel { padding: 11px 11px; }
+  .bento { grid-template-columns: 1fr; }
+  .tile { min-height: auto; padding: 11px 12px; }
+  .detail { padding: 13px 12px; }
+  .tabs { margin: 0 -12px; padding-inline: 12px; }
+  .chart { height: 190px; }
+  .stat-box { padding: 7px 6px; }
+  .stat-val { font-size: 0.84rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+

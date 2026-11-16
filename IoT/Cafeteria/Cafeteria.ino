@@ -15,7 +15,7 @@
     - DHT sensor library (Adafruit) (+ Adafruit Unified Sensor)
 */
 
-#include "secrets.h"  // WIFI_SSID, WIFI_PASSWORD, DATABASE_URL (no se sube a GitHub)
+#include "secrets.h"  // WIFI_SSID, WIFI_PASSWORD, DATABASE_URL, API_KEY, USER_EMAIL, USER_PASSWORD
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <Wire.h>
@@ -24,6 +24,7 @@
 #include <driver/i2s.h>
 #include <Adafruit_VEML7700.h>
 #include <DHT.h>
+#define ENABLE_USER_AUTH  // obligatorio para autenticar con correo y contraseña
 #define ENABLE_DATABASE   // obligatorio en FirebaseClient 2.x: activa Realtime Database
 #include <FirebaseClient.h>
 
@@ -36,15 +37,14 @@ const int HISTORIAL_CADA = 6;              // guarda en historial 1 de cada 6 en
 const float DB_OFFSET = -19.5;             // ajuste de sonido: calibralo para este micro
 
 // ---------- DEPURACION / CALIBRACION ----------
-// Con estos valores todo queda neutro. Cambia UNA cosa a la vez y compara.
 const int   LECTURAS_SONIDO    = 60;     // ~1 s de audio por medicion (cada lectura son ~16 ms)
 const int   DESCARTAR_LECTURAS = 4;      // tira el audio viejo que quedo en el buffer
 const bool  QUITAR_DC          = false;  // true: resta el nivel de continua (DC) del micro
 const int   CANAL              = 0;      // 0 = como antes (el mas fuerte), 1 = izquierdo, 2 = derecho
 const bool  DEBUG_SONIDO       = true;   // imprime el detalle del micro en el serial
-const float TEMP_OFFSET        = -1.7;    // se suma a la temperatura (°C)
-const float HUM_OFFSET         = 15.5;    // se suma a la humedad (puntos %)
-const float LUZ_FACTOR         = 0.88;    // multiplica la luz
+const float TEMP_OFFSET        = -1.7;   // se suma a la temperatura (°C)
+const float HUM_OFFSET         = 15.5;   // se suma a la humedad (puntos %)
+const float LUZ_FACTOR         = 0.88;   // multiplica la luz
 // ------------------------------------
 
 // ---------- PINES ----------
@@ -60,10 +60,10 @@ Adafruit_VEML7700 veml;
 DHT dht(DHT_PIN, DHT_TYPE);
 bool vemlOk = false;
 
-// Firebase (sin autenticacion, base en modo de prueba)
+// Firebase con autenticacion por usuario y contraseña
 WiFiClientSecure ssl_client;
 AsyncClientClass aClient(ssl_client);
-NoAuth noAuth;
+UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
 FirebaseApp app;
 RealtimeDatabase Database;
 
@@ -97,16 +97,15 @@ void iniciarI2S() {
 float leerSonido() {
   static int32_t buf[512];
   size_t bytes = 0;
-  // s = suma, s2 = suma de cuadrados. A = el canal mas fuerte por muestra (como antes), L, R
   double sA = 0, sA2 = 0, sL = 0, sL2 = 0, sR = 0, sR2 = 0;
   long n = 0;
 
   for (int k = 0; k < DESCARTAR_LECTURAS + LECTURAS_SONIDO; k++) {
     i2s_read(I2S_NUM_0, buf, sizeof(buf), &bytes, 100);
     if (k < DESCARTAR_LECTURAS) continue;
-    int pares = bytes / 8;  // 2 muestras de 4 bytes por par
+    int pares = bytes / 8;
     for (int i = 0; i < pares; i++) {
-      int32_t l = buf[2 * i] >> 8;      // 24 bits utiles
+      int32_t l = buf[2 * i] >> 8;
       int32_t r = buf[2 * i + 1] >> 8;
       int32_t s = (abs(l) > abs(r)) ? l : r;
       sA += s;  sA2 += (double)s * s;
@@ -117,7 +116,6 @@ float leerSonido() {
   }
   if (n == 0) return NAN;
 
-  // rms de un canal; con sinDC resta su nivel de continua
   auto rmsDe = [&](double s, double s2, bool sinDC) {
     double m = s / n;
     double v = s2 / n - (sinDC ? m * m : 0.0);
@@ -168,13 +166,11 @@ void sincronizarHora() {
 
 // ---------- Envio a Firebase ----------
 void enviar() {
-  // Si el VEML7700 no se encontro, no mandamos "luz" (la pagina oculta esa tarjeta)
   float luz = vemlOk ? veml.readLux(VEML_LUX_AUTO) * LUZ_FACTOR : NAN;
   float sonido = leerSonido();
   float t = dht.readTemperature();
   float h = dht.readHumidity();
 
-  // Si el DHT falla una lectura, conserva la ultima buena
   if (!isnan(t)) ultimaTemp = t + TEMP_OFFSET;
   if (!isnan(h)) ultimaHum = fminf(100.0f, fmaxf(0.0f, h + HUM_OFFSET));
   if (isnan(sonido)) sonido = 0;
@@ -207,6 +203,15 @@ void enviar() {
   }
 }
 
+void authHandler(AsyncResult &aResult) {
+  if (aResult.isEvent()) {
+    Serial.printf("[Firebase Auth] Evento: %s (%d)\n", aResult.eventLog().message().c_str(), aResult.eventLog().code());
+  }
+  if (aResult.isError()) {
+    Serial.printf("[Firebase Auth] ERROR: %s (%d)\n", aResult.error().message().c_str(), aResult.error().code());
+  }
+}
+
 void setup() {
   Serial.begin(115200);
   delay(1000);
@@ -220,8 +225,8 @@ void setup() {
   conectarWiFi();
   sincronizarHora();
 
-  ssl_client.setInsecure();  // suficiente para este proyecto escolar
-  initializeApp(aClient, app, getAuth(noAuth));
+  ssl_client.setInsecure();
+  initializeApp(aClient, app, getAuth(user_auth), authHandler, "authTask");
   app.getApp<RealtimeDatabase>(Database);
   Database.url(DATABASE_URL);
 }
@@ -233,5 +238,8 @@ void loop() {
   if (app.ready() && (ultimoEnvio == 0 || millis() - ultimoEnvio >= INTERVALO_MS)) {
     ultimoEnvio = millis();
     enviar();
+  } else if (!app.ready() && millis() - ultimoEnvio >= 15000) {
+    ultimoEnvio = millis();
+    Serial.println("Esperando autenticacion en Firebase (app.ready() == false)...");
   }
 }

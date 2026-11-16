@@ -1,0 +1,573 @@
+/* =========================================================
+   PANEL DE FAUNA PASCUALINA (7 ESCENAS EN ENTORNO NATURAL)
+   ========================================================= */
+.thermal-panel {
+  /* Estado óptimo: verde hoja suave */
+  --tp-bg: #EAF2E7;
+  --tp-ink: #002A3F;
+  --tp-muted: #2B5566;
+  --tp-border: rgba(49, 91, 50, 0.2);
+  --tp-stage-bg: #DDEBDD;
+
+  background: var(--tp-bg);
+  color: var(--tp-ink);
+  border: 1px solid var(--tp-border);
+  border-radius: 16px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 11px;
+  min-width: 0;
+  transition: background 0.45s var(--out), border-color 0.35s;
+}
+
+.thermal-panel[data-scene="heat"] {
+  --tp-bg: #F8F0D6;
+  --tp-ink: #002A3F;
+  --tp-muted: #664D03;
+  --tp-border: rgba(148, 82, 0, 0.24);
+  --tp-stage-bg: #E8EEDB;
+}
+
+.thermal-panel[data-scene="noise"] {
+  --tp-bg: #EDF2D9;
+  --tp-ink: #002A3F;
+  --tp-muted: #3F5214;
+  --tp-border: rgba(77, 87, 8, 0.2);
+  --tp-stage-bg: #E2EBD8;
+}
+
+.thermal-panel[data-scene="cold"] {
+  --tp-bg: #E6EFF2;
+  --tp-ink: #002A3F;
+  --tp-muted: #1E4E6E;
+  --tp-border: rgba(0, 95, 153, 0.2);
+  --tp-stage-bg: #DDE9E9;
+}
+
+.thermal-panel[data-scene="offline"] {
+  --tp-bg: #E2E8F0;
+  --tp-ink: #002A3F;
+  --tp-muted: #334B5C;
+  --tp-border: rgba(0, 42, 63, 0.18);
+  --tp-stage-bg: #243D51;
+}
+
+.thermal-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+.thermal-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--tp-muted);
+}
+.temp {
+  font-family: var(--font-mono);
+  font-size: clamp(2.35rem, 4.6vw, 3.45rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin-top: 3px;
+  white-space: nowrap;
+  color: var(--pb-navy);
+}
+.temp small {
+  font-size: 0.42em;
+  font-weight: 600;
+  color: var(--tp-muted);
+  margin-left: 2px;
+  letter-spacing: 0;
+}
+.temp-state-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: 7px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--tp-border);
+  color: var(--pb-navy);
+  white-space: nowrap;
+}
+.temp-state-pill svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+/* Escenario ilustrado natural de Animales Pascualinos */
+.mascot-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 27 / 10;
+  border-radius: 12px;
+  background: var(--tp-stage-bg);
+  border: 1px solid var(--tp-border);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mascot-stage svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.mascot-art { position: absolute; inset: 0; }
+.mascot-art svg { width: 100%; height: 100%; display: block; }
+
+/* Tono de la página según la escena activa */
+body[data-scene="ok"]      { --bg: #D5EDDD; }
+body[data-scene="noise"]   { --bg: #D2EDEF; }
+body[data-scene="heat"]    { --bg: #F7DFC8; }
+body[data-scene="cold"]    { --bg: #D3E3F0; }
+body[data-scene="bright"]  { --bg: #F8EBB8; }
+body[data-scene="dim"]     { --bg: #CFD6E4; }
+body[data-scene="offline"] { --bg: #D8DFE8; }
+.hero[data-scene="bright"] { border-top-color: var(--pb-yellow); }
+.hero[data-scene="dim"]    { border-top-color: #475569; }
+.thermal-panel[data-scene="bright"] { --tp-bg: #FBF2CF; --tp-ink: #002A3F; --tp-muted: #664D03; --tp-border: rgba(148, 82, 0, 0.24); --tp-stage-bg: #FFF4CC; }
+.thermal-panel[data-scene="dim"]    { --tp-bg: #DCE3EE; --tp-ink: #002A3F; --tp-muted: #1E3A52; --tp-border: rgba(30, 58, 82, 0.25); --tp-stage-bg: #243D51; }
+
+/* =========================================================
+   FOOTER: VISOR PROTAGONISTA (1) + GRILLA SIMÉTRICA (3x2)
+   ========================================================= */
+.foot {
+  background: #002A3F;
+  color: #DCE8EE;
+  margin-top: 40px;
+  padding: 28px clamp(12px, 3vw, 28px) calc(env(safe-area-inset-bottom, 0px) + 24px);
+}
+.foot-in { max-width: 1180px; margin: 0 auto; }
+.foot-h { font-size: 1.05rem; font-weight: 800; color: #FFDC2F; margin: 0; letter-spacing: -0.01em; }
+.foot-note { margin: 6px 0 0; font-size: 0.83rem; line-height: 1.5; color: #B5C9D4; max-width: none; }
+.foot-note strong { color: #FFFFFF; font-weight: 700; }
+.foot-tip { margin: 6px 0 0; font-size: 0.78rem; color: #8FAAB8; }
+
+/* --- Visor protagonista (tarjeta activa desplegada y animada) --- */
+.foot-spotlight {
+  margin-top: 16px;
+}
+.foot-spotlight .foot-item {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: center;
+  gap: 18px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.085);
+  border: 1.5px solid rgba(255, 220, 47, 0.45);
+  border-radius: 14px;
+  box-shadow: 0 12px 28px rgba(0, 15, 24, 0.28);
+  cursor: default;
+  animation: footReveal 0.28s var(--out);
+}
+.foot-spotlight .foot-item:hover {
+  transform: none;
+  border-color: rgba(255, 220, 47, 0.45);
+  background: rgba(255, 255, 255, 0.085);
+}
+.foot-spotlight .foot-art {
+  width: 100%;
+  border-radius: 10px;
+  aspect-ratio: 27 / 11;
+  height: auto;
+  min-height: 175px;
+  min-width: 0;
+}
+.foot-spotlight .foot-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.foot-spotlight .foot-head {
+  margin: 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  min-width: 0;
+}
+.foot-spotlight .foot-item h3 {
+  font-size: 1.15rem;
+}
+.foot-spotlight .foot-rule {
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: #FFDC2F;
+}
+.foot-spotlight .foot-chev {
+  display: none;
+}
+
+.foot-state-badge {
+  display: none;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.foot-spotlight .foot-state-badge {
+  display: inline-flex;
+}
+.foot-state-badge.is-live {
+  background: rgba(0, 178, 193, 0.20);
+  border: 1px solid rgba(0, 178, 193, 0.48);
+  color: #7EE8F2;
+}
+.foot-state-badge.is-manual {
+  background: rgba(255, 220, 47, 0.16);
+  border: 1px solid rgba(255, 220, 47, 0.38);
+  color: #FFDC2F;
+}
+
+.foot-bio {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.foot-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.foot-pill {
+  font-size: 0.73rem;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #DCE8EE;
+}
+.foot-pill em {
+  font-style: italic;
+  font-weight: 650;
+  color: #7DD3FC;
+}
+.foot-desc {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.52;
+  color: #DCE8EE;
+}
+.foot-dist {
+  margin: 0;
+  font-size: 0.77rem;
+  color: #9FB7C4;
+}
+.foot-dist strong {
+  color: #FFFFFF;
+  font-weight: 650;
+}
+
+/* --- Grilla simétrica 3x2 con las 6 especies en reposo --- */
+.foot-grid {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 12px;
+}
+.foot-item {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.2s, background 0.2s, transform 0.22s var(--spring);
+}
+.foot-grid .foot-item {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 8px 12px;
+  cursor: pointer;
+  user-select: none;
+}
+.foot-grid .foot-item:hover {
+  border-color: rgba(255, 220, 47, 0.45);
+  background: rgba(255, 255, 255, 0.095);
+  transform: translateY(-2px);
+}
+.foot-grid .foot-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.foot-grid .foot-bio {
+  display: none;
+}
+
+.foot-art {
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 27 / 10;
+  flex-shrink: 0;
+}
+.foot-art svg { width: 100%; height: 100%; display: block; }
+/* Pausa todas las animaciones SVG en las 6 tarjetas compactas */
+.foot-grid .foot-art svg * { animation: none !important; }
+
+.foot-head {
+  margin: 9px 4px 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  flex: 1;
+}
+.foot-head-text { min-width: 0; }
+.foot-item h3 {
+  font-size: 0.87rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  line-height: 1.25;
+}
+.foot-rule {
+  margin: 3px 0 0;
+  font-size: 0.77rem;
+  line-height: 1.35;
+  color: #B5C9D4;
+}
+.foot-chev {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFDC2F;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+  transition: background 0.2s, transform 0.2s;
+}
+.foot-grid .foot-item:hover .foot-chev {
+  background: rgba(255, 220, 47, 0.18);
+  transform: translateY(-1px);
+}
+
+@keyframes footReveal {
+  from { opacity: 0.65; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.foot-meta {
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 18px;
+  font-size: 0.78rem;
+  color: #9FB7C4;
+}
+@media (max-width: 900px) {
+  .foot-spotlight .foot-item { grid-template-columns: 1fr; gap: 14px; }
+  .foot-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px) {
+  .foot-grid { grid-template-columns: 1fr; }
+}
+
+/* Micro-animaciones de la fauna */
+.fa-bob-a, .fa-glide { transform-box: fill-box; transform-origin: center; }
+.fa-bob-a { animation: faBob 1.4s ease-in-out infinite; }
+.fa-glide { animation: faGlide 3.2s ease-in-out infinite; }
+.fa-sweat { transform-box: fill-box; transform-origin: top center; animation: faSweat 2.4s ease-in infinite; }
+.fa-z { animation: faZzz 2.8s ease-in-out infinite backwards; }
+.fa-z2 { animation-delay: 0.55s; }
+.fa-z3 { animation-delay: 1.1s; }
+@keyframes faBob   { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3.5px); } }
+@keyframes faGlide { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+@keyframes faSweat {
+  0%, 20%  { opacity: 0; transform: translateY(-2px) scale(0.75); }
+  45%      { opacity: 1; transform: translateY(0) scale(1); }
+  85%      { opacity: 0.9; transform: translateY(5px) scale(0.95); }
+  100%     { opacity: 0; transform: translateY(7px) scale(0.8); }
+}
+@keyframes faZzz {
+  0%   { opacity: 0; transform: translate(-3px, 6px); }
+  25%  { opacity: 1; }
+  70%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(5px, -9px); }
+}
+
+/* Luciérnagas nocturnas (Geen) */
+.fa-firefly {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: faFirefly 4.2s ease-in-out infinite backwards;
+}
+.fa-ff1 { animation-delay: 0s;    animation-duration: 3.8s; }
+.fa-ff2 { animation-delay: 1.1s;  animation-duration: 4.5s; }
+.fa-ff3 { animation-delay: 2.3s;  animation-duration: 3.6s; }
+.fa-ff4 { animation-delay: 0.6s;  animation-duration: 4.8s; }
+.fa-ff5 { animation-delay: 2.9s;  animation-duration: 4.1s; }
+.fa-ff6 { animation-delay: 1.7s;  animation-duration: 3.9s; }
+
+@keyframes faFirefly {
+  0%, 100% { opacity: 0; transform: translate(0, 4px) scale(0.6); }
+  35%      { opacity: 1; transform: translate(2px, -2px) scale(1.15); }
+  65%      { opacity: 0.85; transform: translate(-2px, -5px) scale(1); }
+}
+
+/* Rayos de sol cálidos (Gecko - Mucha luz) */
+.fa-sunbeam {
+  animation: faSunbeam 4.5s ease-in-out infinite alternate;
+}
+@keyframes faSunbeam {
+  0%   { opacity: 0.25; }
+  100% { opacity: 0.55; }
+}
+
+/* Temblor de frío y vapor de aliento (Zarigüeya - Se siente frío) */
+.fa-shiver {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: faShiver 2.8s ease-in-out infinite;
+}
+@keyframes faShiver {
+  0%, 55%, 100% { transform: translateX(0) rotate(0deg); }
+  60%           { transform: translateX(-1.2px) rotate(-0.8deg); }
+  65%           { transform: translateX(1.2px) rotate(0.8deg); }
+  70%           { transform: translateX(-1px) rotate(-0.6deg); }
+  75%           { transform: translateX(1px) rotate(0.6deg); }
+  80%           { transform: translateX(0) rotate(0deg); }
+}
+
+.fa-breath {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: faBreath 3.6s ease-out infinite;
+}
+@keyframes faBreath {
+  0%, 35%  { opacity: 0; transform: translate(0, 0) scale(0.5); }
+  55%      { opacity: 0.75; transform: translate(-8px, -3px) scale(1); }
+  85%, 100%{ opacity: 0; transform: translate(-18px, -7px) scale(1.35); }
+}
+
+.fa-wind {
+  animation: faWind 4s ease-in-out infinite alternate;
+}
+@keyframes faWind {
+  0%   { transform: translateX(-6px); opacity: 0.45; }
+  100% { transform: translateX(8px); opacity: 0.85; }
+}
+
+/* Pulso de calor en el sol, ala ventilándose y ondas térmicas */
+.fa-sunpulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: faSunPulse 3.2s ease-in-out infinite alternate;
+}
+@keyframes faSunPulse {
+  0%   { transform: scale(0.94); opacity: 0.25; }
+  100% { transform: scale(1.08); opacity: 0.5; }
+}
+
+.fa-fan-wing {
+  transform-box: fill-box;
+  transform-origin: 15% 15%;
+  animation: faFanWing 1.4s ease-in-out infinite alternate;
+}
+@keyframes faFanWing {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(-18deg); }
+}
+
+.fa-heatwave {
+  animation: faHeatwave 2.6s ease-in-out infinite alternate;
+}
+@keyframes faHeatwave {
+  0%   { transform: translate(-2px, 4px); opacity: 0.35; }
+  100% { transform: translate(2px, -5px); opacity: 0.78; }
+}
+
+/* Baile, aleteo y ondas de sonido (Periquito y Canario - Mucho ruido) */
+.fa-dance-a {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: faDanceA 1.1s ease-in-out infinite alternate;
+}
+@keyframes faDanceA {
+  0%   { transform: rotate(-6deg); }
+  100% { transform: rotate(7deg); }
+}
+
+.fa-dance-b {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: faDanceB 0.95s ease-in-out infinite alternate;
+}
+@keyframes faDanceB {
+  0%   { transform: rotate(6deg); }
+  100% { transform: rotate(-7deg); }
+}
+
+.fa-soundwave {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: faSoundwave 1.4s ease-out infinite;
+}
+@keyframes faSoundwave {
+  0%   { opacity: 0; transform: scale(0.65); }
+  45%  { opacity: 0.9; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.35); }
+}
+
+/* Respiración serena y movimiento de cola (Iguana verde - Todo en rango) */
+.fa-iguana-breathe {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: faIguanaBreathe 3.8s ease-in-out infinite alternate;
+}
+@keyframes faIguanaBreathe {
+  0%   { transform: scaleY(1) translateY(0); }
+  100% { transform: scaleY(1.03) translateY(-1px); }
+}
+
+.fa-tail-sway {
+  transform-box: fill-box;
+  transform-origin: left top;
+  animation: faTailSway 4.2s ease-in-out infinite alternate;
+}
+@keyframes faTailSway {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(4deg); }
+}
+
+.mascot-caption {
+  position: absolute;
+  left: 10px;
+  max-width: calc(100% - 20px);
+  bottom: 8px;
+  padding: 2.5px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(0, 42, 63, 0.08);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--pb-navy);
+  pointer-events: none;
+}
+
+.feel {
+  color: var(--tp-muted);
+  font-weight: 600;
+  font-size: 0.81rem;
+  line-height: 1.35;
+}
+.feel[hidden] { display: none; }
+
+
