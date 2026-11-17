@@ -29,19 +29,19 @@ Proyecto universitario que se presentará en los PIA de la Institución Universi
 
 ## Escenas y animales
 
-Cada animal responde a una sola variable. Si varias condiciones se cumplen a la vez, gana la primera de la lista. Cada umbral tiene un pequeño margen de histéresis para que el animal no alterne en el borde.
+Cada escena responde a una condición ambiental. Si coinciden varias, se muestra la primera según la prioridad de esta lista. La temperatura y la luz usan histéresis en sus límites; los cambios entre escenas requieren tres lecturas distintas durante al menos 20 segundos. La desconexión se refleja de inmediato.
 
 | # | Animal | Nombre científico | Se activa con | Libro |
 |---|---|---|---|---|
 | 1 | Currucutú | *Megascops choliba* | Sin lectura hace más de 150 s | p. 22 |
-| 2 | Periquito barbinaranja y canario costeño | *Brotogeris jugularis* y *Sicalis flaveola* | Ruido sobre 60 dB | pp. 17 y 28 |
+| 2 | Canario costeño y periquito barbinaranja | *Sicalis flaveola* y *Brotogeris jugularis* | Ruido sobre 70 dBA | pp. 17 y 28 |
 | 3 | Guacamaya roja | *Ara macao* | Sensación térmica sobre 26.5 °C | p. 16 |
 | 4 | Zarigüeya común | *Didelphis marsupialis* | Sensación térmica bajo 19.5 °C | p. 35 |
 | 5 | Gecko de garganta blanca | *Gonatodes albogularis* | Luz sobre 550 lx | p. 37 |
-| 6 | Geen | *Macaria triplicaria* | Luz bajo 120 lx | p. 40 |
+| 6 | Mariposa búho | *Caligo atreus* | Luz bajo 120 lx | p. 40 |
 | 7 | Iguana verde | *Iguana iguana* | Ninguna de las anteriores | p. 38 |
 
-"Geen" es el nombre que da el libro; indica que la especie no tiene un nombre común reconocido.
+La mariposa búho (*Caligo atreus*) tiene grandes ocelos que recuerdan a ojos y confunden a posibles depredadores. Sus larvas se alimentan de heliconias y musáceas; los adultos consumen frutos en descomposición.
 
 ### Sensación térmica
 
@@ -78,13 +78,15 @@ Esp32-sensores/
 │   ├── demo.css               # Escenarios de demostración
 │   └── responsive.css         # Ajustes para pantallas pequeñas
 ├── js/
-│   ├── config.js              # Configuración
-│   ├── dashboard.js           # Lógica principal del dashboard
+│   ├── config.js              # Umbrales y parámetros de conexión
+│   ├── dashboard.js           # Coordina estado y vistas del panel
 │   ├── intro.js               # Pantalla de introducción animada
 │   ├── utils.js               # Funciones auxiliares
-│   ├── data/                  # Datos del dashboard
-│   ├── services/              # Acceso a Firebase y a los datos
-│   └── ui/                    # Componentes de interfaz
+│   ├── data/                  # metrics.js, measurements.js, fauna.js, mascot-art.js
+│   ├── services/
+│   │   └── firebase.js        # Lecturas y suscripciones a Firebase
+│   └── ui/
+│       └── fauna-footer.js    # Ficha y selector de fauna
 ├── images/                    # Logos de la institución
 ├── docs/images/               # Capturas de la interfaz web
 └── IoT/
@@ -145,7 +147,8 @@ Cada sketch está en una carpeta con el mismo nombre para abrirlo directamente e
    ```
 
 4. Abre el archivo `.ino` de esa carpeta y selecciona la placa correspondiente. Para Bloque 8, habilita **Tools → USB CDC On Boot → Enabled**.
-5. Carga el programa y abre el monitor serial a **115200 baudios**. Si el inicio de sesión no se completa, el monitor muestra "Esperando autenticacion en Firebase" cada 15 s. Cuando funciona, aparece "Firebase actual: OK" en cada envío.
+5. Copia el certificado raíz GTS Root R1 completo desde [Google Trust Services](https://pki.goog/repo/certs/gtsr1.pem) al bloque `GTS_ROOT_R1` de `secrets.h`, siguiendo el formato de `secrets.example.h`.
+6. Carga el programa y abre el monitor serial a **115200 baudios**. Si el inicio de sesión no se completa, el monitor muestra "Esperando autenticacion en Firebase" cada 15 s. Cuando funciona, aparece "Firebase actual: OK" en cada envío.
 
 No reemplaces la plantilla `secrets.example.h` con datos reales dentro del repositorio.
 
@@ -171,16 +174,16 @@ Los sketches escriben en `medio_ambiente/nodos/{id}/actual` y agregan lecturas a
 
 ## Ajustes de calibración
 
-Cada nodo tiene parámetros de ajuste propios en su sketch, porque usa componentes y montajes distintos. Cafetería aplica `TEMP_OFFSET = -1.7 °C`, `HUM_OFFSET = +15.5` puntos porcentuales, `LUZ_FACTOR = 0.88` y `DB_OFFSET = -19.5`. Bloque 8 aplica `TEMP_OFFSET = 0.0 °C`, `HUM_OFFSET = 0.0`, `LUZ_FACTOR = 1.0` y `DB_OFFSET = +14.5`.
+Cada nodo tiene parámetros de ajuste propios en su sketch, porque usa componentes y montajes distintos. Cafetería aplica `TEMP_OFFSET = -1.7 °C`, `HUM_OFFSET = +15.5` puntos porcentuales, `LUZ_FACTOR = 0.88`, y para el micrófono `DB_SLOPE = 1.233` y `DB_OFFSET = 23.5`. Bloque 8 aplica `TEMP_OFFSET = 0 °C`, `HUM_OFFSET = 0`, `LUZ_FACTOR = 1.0`, `DB_SLOPE = 0.965` y `DB_OFFSET = 17.4`. El sonido se procesa con ponderación A y se muestra en dBA.
 
-Estos valores son ajustes prácticos para acercar las lecturas de ambos nodos a las referencias usadas en el proyecto y hacerlas más comparables. No son una calibración metrológica certificada. El DHT11 es menos preciso que el DHT22 y los valores de sonido en dB son aproximados. Si se reemplaza un sensor, cambia su ubicación o se compara con otra referencia, hay que volver a validar los parámetros. El VEML7700 usa lectura automática (`VEML_LUX_AUTO`) en ambos nodos.
+Estos valores son ajustes prácticos para acercar las lecturas de ambos nodos a las referencias usadas en el proyecto y hacerlas más comparables. No constituyen una calibración metrológica certificada. El DHT11 es menos preciso que el DHT22 y el nivel sonoro sigue siendo una estimación, dependiente del micrófono y de su calibración. Si se reemplaza un sensor o cambia su ubicación, hay que volver a validar los parámetros. El VEML7700 usa lectura automática (`VEML_LUX_AUTO`) en ambos nodos.
 
 ## Notas y seguridad
 
 - Los nodos escriben en Firebase con un usuario de Authentication. Las credenciales viven solo en `secrets.h`, que Git ignora.
-- El firmware desactiva la verificación del certificado TLS (`setInsecure()`). Es aceptable para una demostración, pero conviene revisarlo antes de usar el sistema fuera de un entorno controlado.
+- El cliente de Realtime Database valida el certificado con GTS Root R1 cuando el reloj se sincroniza. Si fallan NTP y el respaldo HTTPS de hora, el firmware cae a `setInsecure()` para la base de datos; el cliente de Firebase Authentication y la petición HTTPS que recupera la hora también usan `setInsecure()`. Por eso la verificación TLS todavía no cubre todas las conexiones.
 - Configura las reglas de Realtime Database para que solo los usuarios autenticados puedan escribir.
-- La lectura de sonido en dB es aproximada y depende de `DB_OFFSET`.
+- El nivel sonoro se presenta en dBA estimados y depende de `DB_SLOPE` y `DB_OFFSET`; los umbrales de 70/75 dBA son criterios de interfaz del proyecto, no límites normativos.
 - Los rangos y umbrales del dashboard son criterios del proyecto. No se documentan como certificación ni norma institucional.
 
 ## Créditos y licencia

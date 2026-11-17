@@ -403,7 +403,7 @@ body[data-scene="offline"] { --bg: #D8DFE8; }
   100% { opacity: 0; transform: translate(5px, -9px); }
 }
 
-/* Luciérnagas nocturnas (Geen) */
+/* Luciérnagas nocturnas de la escena de baja iluminación */
 .fa-firefly {
   transform-box: fill-box;
   transform-origin: center;
@@ -571,3 +571,15 @@ body[data-scene="offline"] { --bg: #D8DFE8; }
 .feel[hidden] { display: none; }
 
 
+
+/* La ficha destacada queda visible al elegir una escena en móvil. */
+.foot-spotlight { scroll-margin-top: 72px; }
+
+.mascot-art.scene-enter { animation: sceneEnter 420ms cubic-bezier(.2,.75,.25,1) both; }
+@keyframes sceneEnter {
+  from { opacity: .35; transform: translateY(5px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mascot-art.scene-enter { animation: none; }
+}

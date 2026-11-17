@@ -4,48 +4,43 @@
 
   Sensores:
     VEML7700 (luz)        I2C  SDA=4, SCL=5
-    INMP441 (sonido)      I2S  SCK=9, WS=10, SD=11
+    INMP441 (sonido)      I2S  SCK=9, WS=10, SD=11 (L/R -> GND)
     DHT22 (temp/humedad)  GPIO 7
 
-  Placa: ESP32S3 Dev Module  (Tools -> USB CDC On Boot -> Enabled)
-
-  Librerias (Gestor de librerias):
-    - FirebaseClient (Mobizt)
-    - Adafruit VEML7700 Library (+ Adafruit BusIO)
-    - DHT sensor library (Adafruit) (+ Adafruit Unified Sensor)
+  Placa: ESP32S3 Dev Module (Tools -> USB CDC On Boot -> Enabled)
 */
 
-#include "secrets.h"  // WIFI_SSID, WIFI_PASSWORD, DATABASE_URL, API_KEY, USER_EMAIL, USER_PASSWORD
+#include "secrets.h"  // WIFI_SSID, WIFI_PASSWORD, DATABASE_URL, API_KEY, USER_EMAIL, USER_PASSWORD, GTS_ROOT_R1
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <Wire.h>
 #include <time.h>
+#include <sys/time.h>
 #include <math.h>
 #include <driver/i2s.h>
 #include <Adafruit_VEML7700.h>
 #include <DHT.h>
-#define ENABLE_USER_AUTH  // obligatorio para autenticar con correo y contraseña
-#define ENABLE_DATABASE   // obligatorio en FirebaseClient 2.x: activa Realtime Database
+#define ENABLE_USER_AUTH
+#define ENABLE_DATABASE
 #include <FirebaseClient.h>
 
 // ---------- CONFIGURA ESTO ----------
-const char* NODO_ID     = "bloque8";   // sin espacios ni tildes, es la llave en firebase
-const char* NODO_NOMBRE = "Bloque 8";   // lo que se ve en el selector
+const char* NODO_ID     = "bloque8";
+const char* NODO_NOMBRE = "Bloque 8";
 
 const unsigned long INTERVALO_MS = 10000;  // envio de "actual"
-const int HISTORIAL_CADA = 6;              // guarda en historial 1 de cada 6 envios (cada 60 s)
-const float DB_OFFSET = +14.5;             // ajuste de sonido: calibralo para este micro
+const int HISTORIAL_CADA = 6;              // guarda en historial cada 60 s
 
-// ---------- DEPURACION / CALIBRACION ----------
-const int   LECTURAS_SONIDO    = 60;     // ~1 s de audio por medicion (cada lectura son ~16 ms)
-const int   DESCARTAR_LECTURAS = 4;      // tira el audio viejo que quedo en el buffer
-const bool  QUITAR_DC          = false;  // true: resta el nivel de continua (DC) del micro
-const int   CANAL              = 0;      // 0 = como antes (el mas fuerte), 1 = izquierdo, 2 = derecho
-const bool  DEBUG_SONIDO       = true;   // imprime el detalle del micro en el serial
-const float TEMP_OFFSET        = 0.0;    // se suma a la temperatura (°C)
-const float HUM_OFFSET         = 0.0;    // se suma a la humedad (puntos %)
-const float LUZ_FACTOR         = 1.0;    // multiplica la luz
-// ------------------------------------
+// Calibracion lineal (Microfono Estano: y = DB_SLOPE * dBA + DB_OFFSET)
+const float DB_SLOPE  = 0.965f;
+const float DB_OFFSET = 17.4f;
+
+// ---------- CALIBRACION OTROS SENSORES ----------
+const bool  DEBUG_SONIDO = true;
+const float TEMP_OFFSET  = 0.0f;
+const float HUM_OFFSET   = 0.0f;
+const float LUZ_FACTOR   = 1.0f;
+// ------------------------------------------------
 
 // ---------- PINES ----------
 #define SDA_PIN 4
@@ -60,9 +55,12 @@ Adafruit_VEML7700 veml;
 DHT dht(DHT_PIN, DHT_TYPE);
 bool vemlOk = false;
 
-// Firebase con autenticacion por usuario y contraseña
+// Clientes TLS separados: uno validado para la BD y otro dedicado para Auth
 WiFiClientSecure ssl_client;
+WiFiClientSecure auth_ssl_client;
 AsyncClientClass aClient(ssl_client);
+AsyncClientClass authClient(auth_ssl_client);
+
 UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
 FirebaseApp app;
 RealtimeDatabase Database;
@@ -71,17 +69,40 @@ unsigned long ultimoEnvio = 0;
 int contador = 0;
 float ultimaTemp = NAN, ultimaHum = NAN;
 
-// ---------- Sonido (INMP441 por I2S) ----------
+// ---------- Filtro Ponderacion A (IEC 61672 @ 48 kHz) ----------
+struct Biquad {
+  float b1, b2, neg_a1, neg_a2;
+  float w1 = 0.0f, w2 = 0.0f;
+};
+
+const float A_WEIGHT_GAIN = 0.169994948147430f;
+Biquad filtroA[3] = {
+  {-2.00026996133106f, +1.00027056142719f, -1.060868438509278f, -0.163987445885926f},
+  {+4.35912384203144f, +3.09120265783884f, +1.208419926363593f, -0.273166998428332f},
+  {-0.70930303489759f, -0.29071868393580f, +1.982242159753048f, -0.982298594928989f}
+};
+float dc_x1 = 0.0f, dc_y1 = 0.0f;
+
+inline float procesarPonderacionA(float x) {
+  for (int s = 0; s < 3; s++) {
+    float y = x + filtroA[s].w1;
+    filtroA[s].w1 = filtroA[s].b1 * x + filtroA[s].neg_a1 * y + filtroA[s].w2;
+    filtroA[s].w2 = filtroA[s].b2 * x + filtroA[s].neg_a2 * y;
+    x = y;
+  }
+  return x * A_WEIGHT_GAIN;
+}
+
 void iniciarI2S() {
   i2s_config_t cfg = {};
   cfg.mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_RX);
-  cfg.sample_rate = 16000;
+  cfg.sample_rate = 48000;
   cfg.bits_per_sample = I2S_BITS_PER_SAMPLE_32BIT;
-  cfg.channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT;  // lee ambos canales
+  cfg.channel_format = I2S_CHANNEL_FMT_ONLY_LEFT;
   cfg.communication_format = I2S_COMM_FORMAT_STAND_I2S;
   cfg.intr_alloc_flags = ESP_INTR_FLAG_LEVEL1;
-  cfg.dma_buf_count = 4;
-  cfg.dma_buf_len = 256;
+  cfg.dma_buf_count = 8;
+  cfg.dma_buf_len = 512;
 
   i2s_pin_config_t pins = {};
   pins.mck_io_num = I2S_PIN_NO_CHANGE;
@@ -92,52 +113,58 @@ void iniciarI2S() {
 
   i2s_driver_install(I2S_NUM_0, &cfg, 0, NULL);
   i2s_set_pin(I2S_NUM_0, &pins);
+  i2s_zero_dma_buffer(I2S_NUM_0);
 }
 
 float leerSonido() {
-  static int32_t buf[512];
+  static int32_t buf[1000];
   size_t bytes = 0;
-  double sA = 0, sA2 = 0, sL = 0, sL2 = 0, sR = 0, sR2 = 0;
-  long n = 0;
+  const int MUESTRAS_FAST = 6000;
+  const int VENTANAS = 8;
+  const float FULL_SCALE = 8388608.0f;
 
-  for (int k = 0; k < DESCARTAR_LECTURAS + LECTURAS_SONIDO; k++) {
-    i2s_read(I2S_NUM_0, buf, sizeof(buf), &bytes, 100);
-    if (k < DESCARTAR_LECTURAS) continue;
-    int pares = bytes / 8;
-    for (int i = 0; i < pares; i++) {
-      int32_t l = buf[2 * i] >> 8;
-      int32_t r = buf[2 * i + 1] >> 8;
-      int32_t s = (abs(l) > abs(r)) ? l : r;
-      sA += s;  sA2 += (double)s * s;
-      sL += l;  sL2 += (double)l * l;
-      sR += r;  sR2 += (double)r * r;
-      n++;
-    }
+  i2s_zero_dma_buffer(I2S_NUM_0);
+  for (int d = 0; d < 12; d++) {
+    i2s_read(I2S_NUM_0, buf, 512 * sizeof(int32_t), &bytes, 100);
   }
-  if (n == 0) return NAN;
 
-  auto rmsDe = [&](double s, double s2, bool sinDC) {
-    double m = s / n;
-    double v = s2 / n - (sinDC ? m * m : 0.0);
-    return sqrt(v > 0 ? v : 0.0);
-  };
+  double energiaTotalA = 0.0;
+  for (int w = 0; w < VENTANAS; w++) {
+    double sumaSqA = 0.0;
+    int leidas = 0;
+    while (leidas < MUESTRAS_FAST) {
+      int porLeer = min(1000, MUESTRAS_FAST - leidas);
+      i2s_read(I2S_NUM_0, buf, porLeer * sizeof(int32_t), &bytes, 100);
+      int n = bytes / sizeof(int32_t);
+      if (n <= 0) break;
 
-  double rms;
-  if (CANAL == 1)      rms = rmsDe(sL, sL2, QUITAR_DC);
-  else if (CANAL == 2) rms = rmsDe(sR, sR2, QUITAR_DC);
-  else                 rms = rmsDe(sA, sA2, QUITAR_DC);
+      for (int i = 0; i < n; i++) {
+        int32_t raw = buf[i] >> 8;
+        float x = (float)raw / FULL_SCALE;
+        float x_hp = x - dc_x1 + 0.9974f * dc_y1;
+        dc_x1 = x;
+        dc_y1 = x_hp;
+        float x_a = procesarPonderacionA(x_hp);
+        sumaSqA += (double)x_a * x_a;
+        leidas++;
+      }
+    }
+    if (leidas == 0) return NAN;
+    double meanSqA = sumaSqA / leidas;
+    if (meanSqA < 1e-12) meanSqA = 1e-12;
+    energiaTotalA += meanSqA;
+  }
+
+  float dbaCrudo = 10.0f * log10f((float)(energiaTotalA / VENTANAS)) + 120.0f;
+  float dbaCalibrado = DB_SLOPE * dbaCrudo + DB_OFFSET;
 
   if (DEBUG_SONIDO) {
-    Serial.printf("  [mic] n=%ld | L: dc=%.0f rms=%.0f ac=%.0f | R: dc=%.0f rms=%.0f ac=%.0f | usado=%.0f\n",
-                  n, sL / n, rmsDe(sL, sL2, false), rmsDe(sL, sL2, true),
-                  sR / n, rmsDe(sR, sR2, false), rmsDe(sR, sR2, true), rms);
+    Serial.printf("  [mic] dBA_crudo=%.1f -> dBA_calibrado=%.1f\n", dbaCrudo, dbaCalibrado);
   }
-
-  if (rms < 1) rms = 1;
-  return 20.0 * log10(rms) + DB_OFFSET;
+  return dbaCalibrado;
 }
 
-// ---------- WiFi y hora ----------
+// ---------- WiFi, Hora (NTP + Respaldo HTTPS) y Verificacion TLS ----------
 void conectarWiFi() {
   if (WiFi.status() == WL_CONNECTED) return;
   Serial.print("Conectando a WiFi");
@@ -150,18 +177,82 @@ void conectarWiFi() {
   Serial.println(WiFi.status() == WL_CONNECTED ? " OK" : " fallo");
 }
 
-void sincronizarHora() {
+bool sincronizarHoraHTTPS() {
+  WiFiClientSecure client;
+  client.setInsecure();
+  if (!client.connect("www.google.com", 443)) return false;
+
+  client.println("HEAD / HTTP/1.1");
+  client.println("Host: www.google.com");
+  client.println("Connection: close");
+  client.println();
+
+  unsigned long t0 = millis();
+  while (client.connected() && millis() - t0 < 5000) {
+    String line = client.readStringUntil('\n');
+    if (line.startsWith("Date: ")) {
+      String dateStr = line.substring(6);
+      dateStr.trim();
+      struct tm tm = {};
+      if (strptime(dateStr.c_str(), "%a, %d %b %Y %H:%M:%S GMT", &tm) != NULL) {
+        time_t epoch = mktime(&tm) - _timezone;
+        if (epoch >= 1700000000) {
+          struct timeval tv = { .tv_sec = epoch, .tv_usec = 0 };
+          settimeofday(&tv, NULL);
+          client.stop();
+          return true;
+        }
+      }
+    }
+    if (line == "\r") break;
+  }
+  client.stop();
+  return false;
+}
+
+bool sincronizarHora() {
   configTime(0, 0, "pool.ntp.org", "time.google.com");
-  Serial.print("Sincronizando hora");
+  Serial.print("Sincronizando hora NTP");
   time_t now = time(nullptr);
   int intentos = 0;
-  while (now < 1700000000 && intentos < 30) {
+  while (now < 1700000000 && intentos < 12) {
     delay(500);
     Serial.print(".");
     now = time(nullptr);
     intentos++;
   }
-  Serial.println(now >= 1700000000 ? " OK" : " fallo");
+  if (now >= 1700000000) {
+    Serial.println(" OK (NTP)");
+    return true;
+  }
+
+  Serial.print(" bloqueado, probando HTTPS... ");
+  if (sincronizarHoraHTTPS()) {
+    Serial.println("OK (HTTPS)");
+    return true;
+  }
+
+  Serial.println("fallo");
+  return false;
+}
+
+void verificarEnlaceFirebase() {
+  WiFiClientSecure testClient;
+  testClient.setCACert(GTS_ROOT_R1);
+  String host = String(DATABASE_URL);
+  host.replace("https://", "");
+  int slash = host.indexOf('/');
+  if (slash > 0) host = host.substring(0, slash);
+
+  Serial.printf("Verificando certificado TLS contra %s ... ", host.c_str());
+  if (testClient.connect(host.c_str(), 443)) {
+    Serial.println("TLS VERIFICADO (Certificado autentico)");
+    testClient.stop();
+  } else {
+    char errBuf[128];
+    testClient.lastError(errBuf, sizeof(errBuf));
+    Serial.printf("FALLO TLS: %s\n", errBuf);
+  }
 }
 
 // ---------- Envio a Firebase ----------
@@ -186,7 +277,7 @@ void enviar() {
            NODO_NOMBRE, campoLuz, sonido, isnan(ultimaTemp) ? 0.0 : ultimaTemp,
            isnan(ultimaHum) ? 0.0 : ultimaHum, (unsigned long)ts);
 
-  Serial.printf("Luz: %.1f lx | Sonido: %.1f dB | Temp: %.1f C | Hum: %.1f %% | bloque8\n",
+  Serial.printf("Luz: %.1f lx | Sonido: %.1f dBA | Temp: %.1f C | Hum: %.1f %% | bloque8\n",
                 luz, sonido, ultimaTemp, ultimaHum);
 
   String base = String("/medio_ambiente/nodos/") + NODO_ID;
@@ -223,10 +314,18 @@ void setup() {
   iniciarI2S();
 
   conectarWiFi();
-  sincronizarHora();
+  bool horaOk = sincronizarHora();
 
-  ssl_client.setInsecure();
-  initializeApp(aClient, app, getAuth(user_auth), authHandler, "authTask");
+  if (horaOk) {
+    ssl_client.setCACert(GTS_ROOT_R1);
+    verificarEnlaceFirebase();
+  } else {
+    Serial.println("Advertencia: Sin hora valida, usando modo TLS sin validacion de fecha.");
+    ssl_client.setInsecure();
+  }
+  auth_ssl_client.setInsecure();
+
+  initializeApp(authClient, app, getAuth(user_auth), authHandler, "authTask");
   app.getApp<RealtimeDatabase>(Database);
   Database.url(DATABASE_URL);
 }

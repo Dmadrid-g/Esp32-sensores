@@ -217,3 +217,10 @@
   }
 }
 
+
+@media (max-width: 840px) {
+  .gl-item { align-items: flex-start; white-space: normal; }
+  .gl-copy { display: flex; flex-direction: column; min-width: 0; line-height: 1.15; }
+  .gl-copy small { font-size: 0.88em; opacity: 0.86; }
+  .gl-item i { margin-top: 0.2em; }
+}

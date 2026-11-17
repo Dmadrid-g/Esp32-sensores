@@ -4,7 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#EDF3F1">
-<meta name="theme-color" content="#EDF3F1">
 <link rel="icon" type="image/png" href="images/Pascual%20Blanco.png">
 <title>Monitor Ambiental · I.U. Pascual Bravo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -139,10 +138,10 @@
             <span>45°</span>
           </div>
           <div class="gauge-legend" aria-hidden="true">
-            <span class="gl-item"><i style="background: var(--seg-info)"></i>Se siente frío (&lt;19.5°)</span>
-            <span class="gl-item"><i style="background: var(--seg-ok)"></i>Se siente bien (19.5–26.5°)</span>
-            <span class="gl-item"><i style="background: var(--seg-warn)"></i>Se siente cálido (26.6–29.5°)</span>
-            <span class="gl-item"><i style="background: var(--seg-bad)"></i>Bochorno (&gt;29.5°)</span>
+            <span class="gl-item"><i style="background: var(--seg-info)"></i><span class="gl-copy"><span>Se siente</span><small>frío (&lt;19.5 °C)</small></span></span>
+            <span class="gl-item"><i style="background: var(--seg-ok)"></i><span class="gl-copy"><span>Se siente</span><small>bien (19.5–26.5 °C)</small></span></span>
+            <span class="gl-item"><i style="background: var(--seg-warn)"></i><span class="gl-copy"><span>Se siente</span><small>cálido (26.6–29.5 °C)</small></span></span>
+            <span class="gl-item"><i style="background: var(--seg-bad)"></i><span class="gl-copy"><span>Se siente</span><small>bochorno (&gt;29.5 °C)</small></span></span>
           </div>
         </div>
       </div>
@@ -229,11 +228,11 @@
   <div class="debug-btns" id="debugBtns">
     <button type="button" class="dbg-btn" data-preset="live" aria-pressed="true">En vivo</button>
     <button type="button" class="dbg-btn" data-preset="ok" aria-pressed="false">Iguana verde (Todo en rango)</button>
-    <button type="button" class="dbg-btn" data-preset="noise" aria-pressed="false">Periquito y canario (Ruido)</button>
+    <button type="button" class="dbg-btn" data-preset="noise" aria-pressed="false">Canario y periquito (Ruido)</button>
     <button type="button" class="dbg-btn" data-preset="heat" aria-pressed="false">Guacamaya roja (Calor)</button>
     <button type="button" class="dbg-btn" data-preset="cold" aria-pressed="false">Zarigüeya común (Frío)</button>
     <button type="button" class="dbg-btn" data-preset="bright" aria-pressed="false">Gecko de garganta blanca (Mucha luz)</button>
-    <button type="button" class="dbg-btn" data-preset="dim" aria-pressed="false">Geen (Poca luz)</button>
+    <button type="button" class="dbg-btn" data-preset="dim" aria-pressed="false">Mariposa búho (Poca luz)</button>
     <button type="button" class="dbg-btn" data-preset="offline" aria-pressed="false">Currucutú (Sin señal)</button>
   </div>
 </aside>

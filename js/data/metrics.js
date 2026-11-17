@@ -46,12 +46,12 @@ export const METRICS = [
   },
   {
     key: "sonido", label: "Ruido", tab: "Ruido", articleName: "un ruido",
-    unit: "dB", color: "#007A85", dec: 1, computed: false,
+    unit: "dBA", color: "#007A85", dec: 1, computed: false,
     icon: `<path d="M4 10v4"/><path d="M8 7v10"/><path d="M12 4v16"/><path d="M16 8v8"/><path d="M20 11v2"/>`,
     levels: [
-      [48, "Silencioso", "ok", "Ambiente muy silencioso"],
-      [60, "Normal", "ok", "Nivel de sonido normal"],
-      [72, "Movido", "warn", "Ambiente movido / charla activa"],
+      [50, "Silencioso", "ok", "Ambiente muy silencioso"],
+      [70, "Normal", "ok", "Nivel de sonido habitual"],
+      [75, "Movido", "warn", "Ambiente con ruido elevado"],
       [Infinity, "Ruidoso", "bad", "Nivel de ruido alto"]
     ]
   }
@@ -83,4 +83,20 @@ export const MBY = Object.fromEntries(METRICS.map(m => [m.key, m]));
 export const BENTO_KEYS = ["temperatura", "sensacion", "humedad", "luz", "sonido"];
 export const HISTORY_ORDER = ["temperatura", "sensacion", "humedad", "luz", "sonido"];
 export const SEVERITY_RANK = { bad: 3, warn: 2, info: 1, ok: 0 };
+
+
+export const TONE_ICONS = {
+  ok: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+  warn: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+  bad: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
+  info: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`
+};
+
+export const VIZ_ICONS = {
+  noise: `<div class="eq"><span></span><span></span><span></span><span></span><span></span></div>`,
+  heat: `<svg class="viz-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>`,
+  cold: `<svg class="viz-svg" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>`,
+  offline: `<svg class="viz-svg" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`,
+  ok: `<svg class="viz-svg" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`
+};
 

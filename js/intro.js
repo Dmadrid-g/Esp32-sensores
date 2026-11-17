@@ -89,11 +89,16 @@
     }
   }, 6000);
 
-  if ("IntersectionObserver" in window) {
-    var topHeader = document.getElementById("topHeader");
-    var headerOffset = (topHeader && topHeader.offsetHeight) ? topHeader.offsetHeight : 52;
-    new IntersectionObserver(function (entries) {
-      document.getElementById("topBrand").classList.toggle("show", !entries[0].isIntersecting);
-    }, { rootMargin: "-" + headerOffset + "px 0px 0px 0px" }).observe(document.getElementById("brandTitle"));
+  var topBrand = document.getElementById("topBrand");
+  var topHeader = document.getElementById("topHeader");
+  var mainLogo = document.getElementById("logoWrap");
+  function updateStickyBrand() {
+    if (!topBrand || !topHeader || !mainLogo) return;
+    var logoTop = mainLogo.getBoundingClientRect().top;
+    var logoCoveredByHeader = window.scrollY > 0 && logoTop < topHeader.offsetHeight;
+    topBrand.classList.toggle("show", logoCoveredByHeader);
   }
+  window.addEventListener("scroll", updateStickyBrand, { passive: true });
+  window.addEventListener("resize", updateStickyBrand);
+  updateStickyBrand();
 })();

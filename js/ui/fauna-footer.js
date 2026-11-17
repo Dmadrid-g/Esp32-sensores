@@ -1,4 +1,5 @@
-import { FOOT_SCENES, MASCOT_ART } from "../data/fauna.js";
+import { FOOT_SCENES } from "../data/fauna.js";
+import { MASCOT_ART } from "../data/mascot-art.js";
 
 const footSpotlightEl = document.getElementById("footSpotlight");
 const footScenesEl = document.getElementById("footScenes");
@@ -40,6 +41,9 @@ FOOT_SCENES.forEach((item, idx) => {
   const activate = () => {
     if (el.parentElement === footSpotlightEl) return;
     setFootSpotlight(item.key, false);
+    if (window.matchMedia("(max-width: 760px)").matches) {
+      requestAnimationFrame(() => footSpotlightEl.scrollIntoView({ behavior: "smooth", block: "start" }));
+    }
   };
   el.addEventListener("click", activate);
   el.addEventListener("keydown", e => {
@@ -57,6 +61,7 @@ export function setFootSpotlight(sceneKey, fromLiveSensor = false) {
   const target = footCardsByKey[sceneKey];
   if (!target || !footSpotlightEl || !footScenesEl) return;
 
+  if (fromLiveSensor) lastAutoSyncedScene = sceneKey;
   const current = footSpotlightEl.querySelector(".foot-item");
   Object.values(footCardsByKey).forEach(card => {
     const isActive = card === target;
