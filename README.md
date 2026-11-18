@@ -2,7 +2,7 @@
 
 Proyecto universitario que se presentará en los PIA de la Institución Universitaria Pascual Bravo. Nodos con ESP32 miden luz, sonido, temperatura y humedad en espacios del campus Robledo y envían las lecturas a Firebase Realtime Database. Un dashboard web muestra el estado actual, el historial y un animal del campus que resume la condición del espacio.
 
-Enlace we: https://dmadrid-g.github.io/Esp32-sensores/
+Enlace web: https://dmadrid-g.github.io/Esp32-sensores/
 
 ## Vista previa
 
