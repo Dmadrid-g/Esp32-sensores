@@ -422,6 +422,44 @@
   font-size: 0.75rem;
   color: var(--muted);
 }
+.chart-guide {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px 14px;
+  margin: -2px 0 10px;
+  color: var(--muted);
+  font-size: 0.73rem;
+  line-height: 1.4;
+}
+.chart-guide-title { color: var(--pb-navy); font-weight: 750; }
+.chart-guide-item { display: inline-flex; align-items: center; gap: 6px; }
+.chart-guide-swatch { display: inline-block; flex: 0 0 auto; }
+.chart-guide-swatch-series {
+  width: 17px;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--series-color, #007A85);
+}
+.chart-guide-swatch-gap {
+  width: 12px;
+  height: 12px;
+  border: 1px solid #667579;
+  border-radius: 2px;
+  background: rgba(102, 117, 121, 0.2);
+}
+.chart-guide-help { color: var(--muted); }
+.chart-gap-note {
+  margin: -2px 0 10px;
+  padding: 7px 10px;
+  border-left: 3px solid #667579;
+  border-radius: 0 7px 7px 0;
+  background: var(--card-alt);
+  color: var(--muted);
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+.chart-gap-note[hidden] { display: none; }
 
 .chart {
   position: relative;

@@ -175,6 +175,13 @@
       <p class="dt" id="dTitle">Temperatura (°C)</p>
       <p class="d-meta" id="dMeta">Última hora</p>
     </div>
+    <div class="chart-guide" role="note" aria-label="Cómo leer la gráfica">
+      <strong class="chart-guide-title">Cómo leerla</strong>
+      <span class="chart-guide-item"><span class="chart-guide-swatch chart-guide-swatch-series" id="chartSeriesSwatch" aria-hidden="true"></span><span id="chartSeriesLabel">Lecturas de temperatura</span></span>
+      <span class="chart-guide-item"><span class="chart-guide-swatch chart-guide-swatch-gap" aria-hidden="true"></span><span>Sin datos registrados</span></span>
+      <span class="chart-guide-help">La altura indica el valor; el eje horizontal muestra la hora.</span>
+    </div>
+    <p class="chart-gap-note" id="chartGapNote" role="status" aria-live="polite" hidden></p>
 
     <div class="chart">
       <canvas id="chart" role="img" aria-label="Gráfica del historial de mediciones"></canvas>

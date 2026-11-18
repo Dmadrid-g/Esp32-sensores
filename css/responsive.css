@@ -32,8 +32,11 @@
   .pill { padding: 4px 9px; font-size: 0.71rem; gap: 6px; }
 
   main {
-    padding: 12px 14px calc(76px + env(safe-area-inset-bottom, 0px));
+    padding: 12px 14px calc(20px + env(safe-area-inset-bottom, 0px));
   }
+  body.demo-active main { padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
+
+  .foot { margin-top: 16px; }
 
   .brand { padding: 4px 0 6px; }
   .logo-wrap { margin-bottom: 9px; }

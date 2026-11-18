@@ -100,6 +100,42 @@ const cards = {};
 const lastSceneByNode = {};
 let lastAppliedScene = null;
 const pendingSceneByNode = {};
+// El firmware guarda una muestra de historial aproximadamente cada 60 s.
+const HISTORY_GAP_THRESHOLD_SECONDS = 90;
+
+function formatChartTime(timestamp) {
+  const date = new Date(Number(timestamp) * 1000);
+  const time = date.toLocaleTimeString("es-CO", {
+    hour: "2-digit",
+    minute: "2-digit",
+    ...(rango <= 60 ? { second: "2-digit" } : {})
+  });
+  const newestTimestamp = allFetchedRows.at(-1)?.ts;
+  if (!newestTimestamp) return time;
+  const newestDate = new Date(newestTimestamp * 1000);
+  if (date.toDateString() === newestDate.toDateString()) return time;
+  const day = date.toLocaleDateString("es-CO", { day: "2-digit", month: "2-digit" });
+  return `${day} ${time}`;
+}
+
+function getHistoryGaps(points, windowStart, windowEnd) {
+  const gaps = [];
+  if (!points.length) return gaps;
+  if (points[0].x - windowStart > HISTORY_GAP_THRESHOLD_SECONDS) {
+    gaps.push({ start: windowStart, end: points[0].x });
+  }
+  for (let i = 1; i < points.length; i++) {
+    const previous = points[i - 1];
+    const current = points[i];
+    if (current.x - previous.x > HISTORY_GAP_THRESHOLD_SECONDS) {
+      gaps.push({ start: previous.x, end: current.x });
+    }
+  }
+  if (windowEnd - points.at(-1).x > HISTORY_GAP_THRESHOLD_SECONDS) {
+    gaps.push({ start: points.at(-1).x, end: windowEnd });
+  }
+  return gaps;
+}
 
 // Respaldo de datos reales de Firebase mientras se usa el modo depuración
 let realCur = null;
@@ -254,6 +290,54 @@ HISTORY_ORDER.map(key => MBY[key]).filter(Boolean).forEach(m => {
 
 // ---------- Inicializar Chart.js ----------
 const getMaxXTicks = () => (window.innerWidth <= 420 ? 4 : window.innerWidth <= 840 ? 6 : 8);
+let chartGapRanges = [];
+
+const chartGapBands = {
+  id: "chartGapBands",
+  beforeDraw(chartInstance) {
+    if (!chartGapRanges.length) return;
+    const { ctx, chartArea, scales } = chartInstance;
+    if (!chartArea || !scales.x) return;
+    const { left, top, right, bottom } = chartArea;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(left, top, right - left, bottom - top);
+    ctx.clip();
+
+    chartGapRanges.forEach(gap => {
+      const x1 = scales.x.getPixelForValue(gap.start);
+      const x2 = scales.x.getPixelForValue(gap.end);
+      const bandLeft = Math.max(left, Math.min(x1, x2));
+      const bandRight = Math.min(right, Math.max(x1, x2));
+      const bandWidth = bandRight - bandLeft;
+      if (bandWidth <= 0) return;
+
+      ctx.fillStyle = "rgba(102, 117, 121, 0.13)";
+      ctx.fillRect(bandLeft, top, bandWidth, bottom - top);
+      ctx.strokeStyle = "rgba(82, 97, 101, 0.8)";
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath();
+      ctx.moveTo(bandLeft, top);
+      ctx.lineTo(bandLeft, bottom);
+      ctx.moveTo(bandRight, top);
+      ctx.lineTo(bandRight, bottom);
+      ctx.stroke();
+
+      if (bandWidth >= 150) {
+        ctx.setLineDash([]);
+        ctx.fillStyle = "#455255";
+        ctx.font = "600 10px system-ui, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+        ctx.fillText("Sin datos registrados", (bandLeft + bandRight) / 2, top + 8);
+      }
+    });
+
+    ctx.restore();
+  }
+};
 
 const chart = window.Chart ? new Chart($("chart"), {
   type: "line",
@@ -281,6 +365,7 @@ const chart = window.Chart ? new Chart($("chart"), {
       }
     }]
   },
+  plugins: [chartGapBands],
   options: {
     responsive: true,
     maintainAspectRatio: false,
@@ -303,7 +388,7 @@ const chart = window.Chart ? new Chart($("chart"), {
             if (!items.length) return "";
             const idx = items[0].dataIndex;
             const total = items[0].dataset.data.length;
-            return items[0].label + (idx === total - 1 ? " · Más reciente" : "");
+            return formatChartTime(items[0].parsed.x) + (idx === total - 1 ? " · Más reciente" : "");
           },
           label: c => {
             const m = MBY[metric];
@@ -316,9 +401,15 @@ const chart = window.Chart ? new Chart($("chart"), {
     },
     scales: {
       x: {
+        type: "linear",
         grid: { display: false },
         border: { display: false },
-        ticks: { maxTicksLimit: getMaxXTicks(), maxRotation: 0, font: { family: "JetBrains Mono", size: 11 } }
+        ticks: {
+          maxTicksLimit: getMaxXTicks(),
+          maxRotation: 0,
+          font: { family: "JetBrains Mono", size: 11 },
+          callback: value => formatChartTime(value)
+        }
       },
       y: {
         grace: "12%",
@@ -381,6 +472,12 @@ function renderStatus() {
   Object.keys(cards).forEach(updateCard);
 }
 setInterval(renderStatus, 5000);
+// Mantiene el extremo derecho del historial en el presente, incluso si un nodo deja de enviar.
+setInterval(() => {
+  if (activeDebugPreset) return;
+  filtrarRowsPorTiempo();
+  renderChart();
+}, 30000);
 
 // ---------- Tarjetas de ubicación ----------
 function ensureCard(id) {
@@ -728,10 +825,9 @@ function filtrarRowsPorTiempo() {
     rows = [];
     return;
   }
-  // Toma el timestamp del registro más reciente como referencia en vez de Date.now()
-  const latestTs = allFetchedRows[allFetchedRows.length - 1].ts;
-  const cutoffSec = latestTs - (rango * 60) - 60;
-  rows = allFetchedRows.filter(r => r.ts >= cutoffSec);
+  const windowEnd = Math.floor(Date.now() / 1000);
+  const cutoffSec = windowEnd - (rango * 60);
+  rows = allFetchedRows.filter(r => r.ts >= cutoffSec && r.ts <= windowEnd);
 }
 
 function renderChart() {
@@ -742,8 +838,27 @@ function renderChart() {
   const pts = rows
     .filter(r => num(r[metric]) && num(r.ts))
     .map(r => ({ x: toNum(r.ts), y: toNum(r[metric]) }));
+  const windowEnd = Math.floor(Date.now() / 1000);
+  const windowStart = windowEnd - rango * 60;
+  const gaps = getHistoryGaps(pts, windowStart, windowEnd);
+  const gapNote = $("chartGapNote");
+  chartGapRanges = gaps;
+  $("chartSeriesSwatch").style.setProperty("--series-color", m.color);
+  $("chartSeriesLabel").textContent = m.computed
+    ? `Serie estimada: ${m.label.toLowerCase()}`
+    : `Lecturas: ${m.label.toLowerCase()}`;
 
   $("dMeta").textContent = pts.length ? `${rangoNombre} · ${pts.length} registros` : rangoNombre;
+  if (!gaps.length) {
+    gapNote.hidden = true;
+    gapNote.textContent = "";
+  } else {
+    const longestGap = gaps.reduce((longest, gap) => gap.end - gap.start > longest.end - longest.start ? gap : longest);
+    gapNote.textContent = gaps.length === 1
+      ? `Sin lecturas entre ${formatChartTime(longestGap.start)} y ${formatChartTime(longestGap.end)}`
+      : `${gaps.length} intervalos sin lecturas · El mayor: ${formatChartTime(longestGap.start)}–${formatChartTime(longestGap.end)}`;
+    gapNote.hidden = false;
+  }
 
   const empty = !pts.length;
   $("none").hidden = !empty;
@@ -761,6 +876,9 @@ function renderChart() {
     if (chart) {
       chart.data.labels = [];
       chart.data.datasets[0].data = [];
+      chartGapRanges = [];
+      chart.options.scales.x.min = undefined;
+      chart.options.scales.x.max = undefined;
       chart.update("none");
     }
     return;
@@ -785,15 +903,18 @@ function renderChart() {
 
   if (!chart) return;
 
-  chart.data.labels = pts.map(p =>
-    new Date(p.x * 1000).toLocaleTimeString("es-CO", {
-      hour: "2-digit",
-      minute: "2-digit",
-      ...(rango <= 60 ? { second: "2-digit" } : {})
-    })
-  );
-  chart.data.datasets[0].data = pts.map(p => p.y);
+  const chartPoints = [];
+  pts.forEach((point, index) => {
+    if (index > 0 && point.x - pts[index - 1].x > HISTORY_GAP_THRESHOLD_SECONDS) {
+      chartPoints.push({ x: (point.x + pts[index - 1].x) / 2, y: null });
+    }
+    chartPoints.push(point);
+  });
+  chart.data.labels = [];
+  chart.data.datasets[0].data = chartPoints;
   chart.data.datasets[0].borderColor = m.color;
+  chart.options.scales.x.min = windowStart;
+  chart.options.scales.x.max = windowEnd;
   chart.options.scales.x.ticks.maxTicksLimit = getMaxXTicks();
   chart.update();
 }
@@ -1087,6 +1208,7 @@ const debugBtns = $("debugBtns");
 
 if (debugDock && debugBtns && debugToggle) {
   const showDemo = new URLSearchParams(location.search).get("demo") === "1";
+  document.body.classList.toggle("demo-active", showDemo);
   debugDock.hidden = !showDemo;
   debugBtns.addEventListener("click", e => {
     const btn = e.target.closest(".dbg-btn");

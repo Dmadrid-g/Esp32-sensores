@@ -41,9 +41,16 @@ FOOT_SCENES.forEach((item, idx) => {
   const activate = () => {
     if (el.parentElement === footSpotlightEl) return;
     setFootSpotlight(item.key, false);
-    if (window.matchMedia("(max-width: 760px)").matches) {
-      requestAnimationFrame(() => footSpotlightEl.scrollIntoView({ behavior: "smooth", block: "start" }));
-    }
+    requestAnimationFrame(() => {
+      const header = document.querySelector(".top");
+      const topLimit = header?.getBoundingClientRect().bottom ?? 0;
+      const bounds = footSpotlightEl.getBoundingClientRect();
+      const fullyVisible = bounds.top >= topLimit && bounds.bottom <= window.innerHeight;
+      if (!fullyVisible) {
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        footSpotlightEl.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+      }
+    });
   };
   el.addEventListener("click", activate);
   el.addEventListener("keydown", e => {

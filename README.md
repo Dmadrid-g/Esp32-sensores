@@ -23,7 +23,7 @@ Proyecto universitario que se presentará en los PIA de la Institución Universi
 - Panel principal con la **sensación térmica** como valor principal. Debajo se muestran la temperatura del aire, la humedad y la diferencia entre ambas.
 - Una escena ilustrada en SVG con el animal que corresponde a la condición actual.
 - Tarjetas de medición (temperatura, sensación térmica, humedad, iluminación y ruido) con mínimo y máximo.
-- Historial de 1 h, 6 h y 24 h para cada variable.
+- Historial de 1 h, 6 h y 24 h para cada variable. Los intervalos sin lecturas se sombrean en gris y se identifican como **Sin datos registrados**; la gráfica avanza hasta la hora actual y se actualiza cada 30 segundos.
 - Guía de escenas en el pie de página: cada animal con su condición de activación y una ficha ecológica y taxonómica.
 - Panel de escenarios de demostración para forzar cada animal sin depender de los sensores.
 
@@ -60,10 +60,18 @@ Las especies y sus descripciones salen del libro *Biodiversidad en la Instituci�
 
 ## Estado del proyecto
 
+- **Versión actual:** lista para presentación y considerada la versión final por ahora.
+- **Cambios futuros:** se harán para corregir errores detectados o añadir una funcionalidad que el equipo decida incorporar.
 - **Bloque 8:** nodo implementado con luz, sonido, temperatura y humedad.
 - **Cafetería:** nodo implementado con luz, sonido, temperatura y humedad.
 - **Dashboard:** consulta los nodos de Firebase y muestra lecturas, historial y escenas.
 - **Presentación:** pendiente en los PIA de la universidad.
+
+### Ajustes incluidos en esta versión
+
+- La guía del historial explica cómo leer la serie y distingue los periodos sin datos con un sombreado gris neutro. Un aviso resume los intervalos vacíos y la gráfica extiende el eje hasta el momento actual, incluso cuando un nodo deja de enviar lecturas.
+- Al elegir una escena de fauna, su ficha se desplaza a la vista si queda fuera de pantalla, tanto en computadora como en móvil; se respeta la preferencia del sistema por reducir el movimiento.
+- Se redujo el espacio entre el historial y la guía de fauna, manteniendo espacio para el panel de demostración y las áreas seguras de pantallas móviles.
 
 ## Estructura
 

@@ -245,8 +245,9 @@
 main {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 16px clamp(12px, 3vw, 28px) calc(84px + env(safe-area-inset-bottom, 0px));
+  padding: 16px clamp(12px, 3vw, 28px) calc(24px + env(safe-area-inset-bottom, 0px));
 }
+body.demo-active main { padding-bottom: calc(104px + env(safe-area-inset-bottom, 0px)); }
 .sec-head {
   display: flex;
   flex-wrap: wrap;

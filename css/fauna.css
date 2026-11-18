@@ -140,7 +140,7 @@ body[data-scene="offline"] { --bg: #D8DFE8; }
 .foot {
   background: #002A3F;
   color: #DCE8EE;
-  margin-top: 40px;
+  margin-top: 20px;
   padding: 28px clamp(12px, 3vw, 28px) calc(env(safe-area-inset-bottom, 0px) + 24px);
 }
 .foot-in { max-width: 1180px; margin: 0 auto; }
@@ -572,7 +572,7 @@ body[data-scene="offline"] { --bg: #D8DFE8; }
 
 
 
-/* La ficha destacada queda visible al elegir una escena en móvil. */
+/* Mantiene la ficha seleccionada visible al navegar desde la cuadrícula. */
 .foot-spotlight { scroll-margin-top: 72px; }
 
 .mascot-art.scene-enter { animation: sceneEnter 420ms cubic-bezier(.2,.75,.25,1) both; }
